@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
+  const { user, logoutUser } = useAuth();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -19,6 +23,17 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      toast.success('Successfully logged out!');
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to log out.');
+    }
+  };
 
   return (
     <header
@@ -38,11 +53,11 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Nav Links */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-6">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `font-semibold transition-colors duration-200 ${
+              `font-semibold transition-colors duration-200 py-1 ${
                 isActive
                   ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
                   : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
@@ -54,7 +69,7 @@ export default function Navbar() {
           <NavLink
             to="/tutors"
             className={({ isActive }) =>
-              `font-semibold transition-colors duration-200 ${
+              `font-semibold transition-colors duration-200 py-1 ${
                 isActive
                   ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
                   : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
@@ -63,30 +78,47 @@ export default function Navbar() {
           >
             Find Tutors
           </NavLink>
-          <NavLink
-            to="/add-tutor"
-            className={({ isActive }) =>
-              `font-semibold transition-colors duration-200 ${
-                isActive
-                  ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
-                  : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
-              }`
-            }
-          >
-            Add Tutor
-          </NavLink>
-          <NavLink
-            to="/my-bookings"
-            className={({ isActive }) =>
-              `font-semibold transition-colors duration-200 ${
-                isActive
-                  ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
-                  : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
-              }`
-            }
-          >
-            My Bookings
-          </NavLink>
+          
+          {user && (
+            <>
+              <NavLink
+                to="/add-tutor"
+                className={({ isActive }) =>
+                  `font-semibold transition-colors duration-200 py-1 ${
+                    isActive
+                      ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
+                      : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
+                  }`
+                }
+              >
+                Add Tutor
+              </NavLink>
+              <NavLink
+                to="/my-bookings"
+                className={({ isActive }) =>
+                  `font-semibold transition-colors duration-200 py-1 ${
+                    isActive
+                      ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
+                      : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
+                  }`
+                }
+              >
+                My Bookings
+              </NavLink>
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `font-semibold transition-colors duration-200 py-1 ${
+                    isActive
+                      ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
+                      : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
+                  }`
+                }
+              >
+                System Stats
+              </NavLink>
+            </>
+          )}
         </nav>
 
         {/* Action Controls */}
@@ -102,21 +134,45 @@ export default function Navbar() {
             </span>
           </button>
 
-          {/* Action buttons (Mock state for login/logout) */}
-          <div className="hidden sm:flex items-center gap-2">
-            <Link
-              to="/login"
-              className="px-5 py-2 font-label-md text-label-md font-semibold text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="px-6 py-2 bg-primary text-on-secondary rounded-full font-label-md text-label-md font-semibold hover:opacity-90 transition-all active:scale-95"
-            >
-              Register
-            </Link>
-          </div>
+          {/* Authentication States */}
+          {user ? (
+            <div className="hidden sm:flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
+                  {user.photoURL ? (
+                    <img alt={user.displayName} className="w-full h-full object-cover" src={user.photoURL} />
+                  ) : (
+                    <span className="material-symbols-outlined text-primary text-xl">person</span>
+                  )}
+                </div>
+                <span className="text-xs font-bold text-on-surface truncate max-w-[100px]">
+                  {user.displayName || 'Doc'}
+                </span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-full font-label-md text-label-md font-semibold transition-colors active:scale-95 flex items-center gap-1"
+              >
+                Logout
+                <span className="material-symbols-outlined text-sm">logout</span>
+              </button>
+            </div>
+          ) : (
+            <div className="hidden sm:flex items-center gap-2">
+              <Link
+                to="/login"
+                className="px-5 py-2 font-label-md text-label-md font-semibold text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="px-6 py-2 bg-primary text-on-secondary rounded-full font-label-md text-label-md font-semibold hover:opacity-90 transition-all active:scale-95"
+              >
+                Register
+              </Link>
+            </div>
+          )}
 
           {/* Mobile menu trigger */}
           <button
@@ -147,36 +203,73 @@ export default function Navbar() {
           >
             Find Tutors
           </Link>
-          <Link
-            to="/add-tutor"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
-          >
-            Add Tutor
-          </Link>
-          <Link
-            to="/my-bookings"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
-          >
-            My Bookings
-          </Link>
-          <div className="flex flex-col gap-2 pt-2">
-            <Link
-              to="/login"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 border border-primary text-primary dark:border-primary-fixed-dim dark:text-primary-fixed-dim rounded-xl font-semibold"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 bg-primary text-on-secondary rounded-xl font-semibold"
-            >
-              Register
-            </Link>
-          </div>
+          
+          {user ? (
+            <>
+              <Link
+                to="/add-tutor"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
+              >
+                Add Tutor
+              </Link>
+              <Link
+                to="/my-bookings"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
+              >
+                My Bookings
+              </Link>
+              <Link
+                to="/admin"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
+              >
+                System Stats
+              </Link>
+              <div className="flex flex-col gap-2 pt-2">
+                <div className="flex items-center gap-2 py-2">
+                  <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
+                    {user.photoURL ? (
+                      <img alt={user.displayName} className="w-full h-full object-cover" src={user.photoURL} />
+                    ) : (
+                      <span className="material-symbols-outlined text-primary text-xl">person</span>
+                    )}
+                  </div>
+                  <span className="text-sm font-bold text-on-surface">
+                    {user.displayName || user.email}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full text-center py-2.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-semibold flex items-center justify-center gap-1"
+                >
+                  Logout
+                  <span className="material-symbols-outlined text-sm">logout</span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col gap-2 pt-2">
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 border border-primary text-primary dark:border-primary-fixed-dim dark:text-primary-fixed-dim rounded-xl font-semibold"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 bg-primary text-on-secondary rounded-xl font-semibold"
+              >
+                Register
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </header>
