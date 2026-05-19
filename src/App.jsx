@@ -2,6 +2,8 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import useDocumentTitle from './hooks/useDocumentTitle';
 
@@ -32,26 +34,6 @@ function MyBookingsPlaceholder() {
     <div className="py-20 text-center">
       <h1 className="text-4xl font-bold text-primary mb-4">My Bookings & Tutors</h1>
       <p className="text-on-surface-variant font-medium">My Bookings Page (Phase 13)</p>
-    </div>
-  );
-}
-
-function LoginPlaceholder() {
-  useDocumentTitle('Login');
-  return (
-    <div className="py-20 text-center">
-      <h1 className="text-4xl font-bold text-primary mb-4">Sign In</h1>
-      <p className="text-on-surface-variant font-medium">Login Page (Phase 8)</p>
-    </div>
-  );
-}
-
-function RegisterPlaceholder() {
-  useDocumentTitle('Register');
-  return (
-    <div className="py-20 text-center">
-      <h1 className="text-4xl font-bold text-primary mb-4">Create Account</h1>
-      <p className="text-on-surface-variant font-medium">Register Page (Phase 8)</p>
     </div>
   );
 }
@@ -95,7 +77,7 @@ function App() {
         path="/login"
         element={
           <Layout>
-            <LoginPlaceholder />
+            <Login />
           </Layout>
         }
       />
@@ -103,7 +85,7 @@ function App() {
         path="/register"
         element={
           <Layout>
-            <RegisterPlaceholder />
+            <Register />
           </Layout>
         }
       />
