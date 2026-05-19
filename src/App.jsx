@@ -1,38 +1,131 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import { useTheme } from './context/ThemeContext';
-import toast from 'react-hot-toast';
+import NotFound from './pages/NotFound';
+import useDocumentTitle from './hooks/useDocumentTitle';
+
+// Simple placeholders for pages to be built in subsequent phases
+function HomePlaceholder() {
+  useDocumentTitle('Home');
+  return (
+    <div className="py-20 text-center">
+      <h1 className="text-4xl font-bold text-primary mb-4">Welcome to MediQueue</h1>
+      <p className="text-on-surface-variant font-medium">Home Page (Phase 7)</p>
+    </div>
+  );
+}
+
+function TutorsPlaceholder() {
+  useDocumentTitle('Tutors Catalog');
+  return (
+    <div className="py-20 text-center">
+      <h1 className="text-4xl font-bold text-primary mb-4">Explore Tutors</h1>
+      <p className="text-on-surface-variant font-medium">Tutors Page (Phase 9)</p>
+    </div>
+  );
+}
+
+function AddTutorPlaceholder() {
+  useDocumentTitle('Add Tutor');
+  return (
+    <div className="py-20 text-center">
+      <h1 className="text-4xl font-bold text-primary mb-4">Add a Medical Tutor</h1>
+      <p className="text-on-surface-variant font-medium">Add Tutor Page (Phase 12)</p>
+    </div>
+  );
+}
+
+function MyBookingsPlaceholder() {
+  useDocumentTitle('My Bookings');
+  return (
+    <div className="py-20 text-center">
+      <h1 className="text-4xl font-bold text-primary mb-4">My Bookings & Tutors</h1>
+      <p className="text-on-surface-variant font-medium">My Bookings Page (Phase 13)</p>
+    </div>
+  );
+}
+
+function LoginPlaceholder() {
+  useDocumentTitle('Login');
+  return (
+    <div className="py-20 text-center">
+      <h1 className="text-4xl font-bold text-primary mb-4">Sign In</h1>
+      <p className="text-on-surface-variant font-medium">Login Page (Phase 8)</p>
+    </div>
+  );
+}
+
+function RegisterPlaceholder() {
+  useDocumentTitle('Register');
+  return (
+    <div className="py-20 text-center">
+      <h1 className="text-4xl font-bold text-primary mb-4">Create Account</h1>
+      <p className="text-on-surface-variant font-medium">Register Page (Phase 8)</p>
+    </div>
+  );
+}
 
 function App() {
-  const { theme } = useTheme();
-
-  const handleTestToast = () => {
-    toast.success(`Active Theme: ${theme.toUpperCase()}`);
-  };
-
   return (
-    <Layout>
-      <div className="flex flex-col justify-center items-center py-20 px-6">
-        <div className="max-w-md w-full text-center p-8 bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/30 dark:bg-inverse-surface/30">
-          <span className="material-symbols-outlined text-primary text-5xl mb-4">school</span>
-          <h1 className="text-3xl font-bold text-primary dark:text-primary-fixed-dim mb-2 tracking-tight">
-            MediQueue
-          </h1>
-          <p className="text-on-surface-variant dark:text-surface-variant mb-6 font-medium">
-            Phase 3: Navbar and Footer components created and rendered inside a global Layout structure!
-          </p>
-          
-          <div className="flex flex-col gap-3 justify-center items-center">
-            <button
-              onClick={handleTestToast}
-              className="flex items-center gap-2 px-6 py-2.5 bg-secondary text-on-secondary rounded-full font-semibold hover:opacity-90 active:scale-95 transition-all"
-            >
-              Show Test Toast
-            </button>
-          </div>
-        </div>
-      </div>
-    </Layout>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <Layout>
+            <HomePlaceholder />
+          </Layout>
+        }
+      />
+      <Route
+        path="/tutors"
+        element={
+          <Layout>
+            <TutorsPlaceholder />
+          </Layout>
+        }
+      />
+      <Route
+        path="/add-tutor"
+        element={
+          <Layout>
+            <AddTutorPlaceholder />
+          </Layout>
+        }
+      />
+      <Route
+        path="/my-bookings"
+        element={
+          <Layout>
+            <MyBookingsPlaceholder />
+          </Layout>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <Layout>
+            <LoginPlaceholder />
+          </Layout>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <Layout>
+            <RegisterPlaceholder />
+          </Layout>
+        }
+      />
+      {/* Catch-all NotFound Page */}
+      <Route
+        path="*"
+        element={
+          <Layout>
+            <NotFound />
+          </Layout>
+        }
+      />
+    </Routes>
   );
 }
 
