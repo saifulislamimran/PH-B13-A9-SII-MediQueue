@@ -2,22 +2,13 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import Tutors from './pages/Tutors';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import useDocumentTitle from './hooks/useDocumentTitle';
 
 // Simple placeholders for pages to be built in subsequent phases
-function TutorsPlaceholder() {
-  useDocumentTitle('Tutors Catalog');
-  return (
-    <div className="py-20 text-center">
-      <h1 className="text-4xl font-bold text-primary mb-4">Explore Tutors</h1>
-      <p className="text-on-surface-variant font-medium">Tutors Page (Phase 9)</p>
-    </div>
-  );
-}
-
 function AddTutorPlaceholder() {
   useDocumentTitle('Add Tutor');
   return (
@@ -53,7 +44,7 @@ function App() {
         path="/tutors"
         element={
           <Layout>
-            <TutorsPlaceholder />
+            <Tutors />
           </Layout>
         }
       />
