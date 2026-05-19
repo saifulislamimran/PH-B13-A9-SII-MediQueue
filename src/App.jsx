@@ -6,6 +6,7 @@ import Tutors from './pages/Tutors';
 import TutorDetails from './pages/TutorDetails';
 import AddTutor from './pages/AddTutor';
 import MyBookings from './pages/MyBookings';
+import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
@@ -58,6 +59,16 @@ function App() {
           <PrivateRoute>
             <Layout>
               <MyBookings />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <AdminDashboard />
             </Layout>
           </PrivateRoute>
         }
