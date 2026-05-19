@@ -3,9 +3,11 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Tutors from './pages/Tutors';
+import TutorDetails from './pages/TutorDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
+import PrivateRoute from './components/PrivateRoute';
 import useDocumentTitle from './hooks/useDocumentTitle';
 
 // Simple placeholders for pages to be built in subsequent phases
@@ -48,22 +50,40 @@ function App() {
           </Layout>
         }
       />
+      
+      {/* Protected Routes */}
+      <Route
+        path="/tutor/:id"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <TutorDetails />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
       <Route
         path="/add-tutor"
         element={
-          <Layout>
-            <AddTutorPlaceholder />
-          </Layout>
+          <PrivateRoute>
+            <Layout>
+              <AddTutorPlaceholder />
+            </Layout>
+          </PrivateRoute>
         }
       />
       <Route
         path="/my-bookings"
         element={
-          <Layout>
-            <MyBookingsPlaceholder />
-          </Layout>
+          <PrivateRoute>
+            <Layout>
+              <MyBookingsPlaceholder />
+            </Layout>
+          </PrivateRoute>
         }
       />
+      
+      {/* Auth Routes */}
       <Route
         path="/login"
         element={
@@ -80,6 +100,7 @@ function App() {
           </Layout>
         }
       />
+      
       {/* Catch-all NotFound Page */}
       <Route
         path="*"
