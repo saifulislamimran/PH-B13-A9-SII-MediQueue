@@ -1,20 +1,11 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
+import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import useDocumentTitle from './hooks/useDocumentTitle';
 
 // Simple placeholders for pages to be built in subsequent phases
-function HomePlaceholder() {
-  useDocumentTitle('Home');
-  return (
-    <div className="py-20 text-center">
-      <h1 className="text-4xl font-bold text-primary mb-4">Welcome to MediQueue</h1>
-      <p className="text-on-surface-variant font-medium">Home Page (Phase 7)</p>
-    </div>
-  );
-}
-
 function TutorsPlaceholder() {
   useDocumentTitle('Tutors Catalog');
   return (
@@ -72,7 +63,7 @@ function App() {
         path="/"
         element={
           <Layout>
-            <HomePlaceholder />
+            <Home />
           </Layout>
         }
       />
