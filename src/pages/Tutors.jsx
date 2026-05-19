@@ -15,8 +15,9 @@ export default function Tutors() {
 
   // Extract unique subjects across all tutors
   const allSubjects = useMemo(() => {
+    const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
     const subjects = new Set();
-    mockTutors.forEach((tutor) => {
+    [...customTutors, ...mockTutors].forEach((tutor) => {
       tutor.subjects.forEach((sub) => subjects.add(sub));
     });
     return ['All', ...Array.from(subjects)];
@@ -24,7 +25,8 @@ export default function Tutors() {
 
   // Filter and Sort Logic
   const filteredTutors = useMemo(() => {
-    let result = [...mockTutors];
+    const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
+    let result = [...customTutors, ...mockTutors];
 
     // 1. Text Search query (matches name or subject tags)
     if (searchQuery.trim()) {
@@ -45,9 +47,6 @@ export default function Tutors() {
     }
 
     // 3. Mock Date Filter
-    // In our mock, tutors have daily availability. Selecting any date shows tutors, 
-    // but selecting a past date simulates fully booked. For dates, we show tutors,
-    // and if a specific weekend is selected, we can show specific listings. Let's make it simulated.
     if (selectedDate) {
       const day = new Date(selectedDate).getDay();
       // Mock: Dr. Sarah Johnson is not available on Sundays (day 0)

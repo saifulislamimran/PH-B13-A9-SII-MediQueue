@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Tutors from './pages/Tutors';
 import TutorDetails from './pages/TutorDetails';
+import AddTutor from './pages/AddTutor';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
@@ -11,16 +12,6 @@ import PrivateRoute from './components/PrivateRoute';
 import useDocumentTitle from './hooks/useDocumentTitle';
 
 // Simple placeholders for pages to be built in subsequent phases
-function AddTutorPlaceholder() {
-  useDocumentTitle('Add Tutor');
-  return (
-    <div className="py-20 text-center">
-      <h1 className="text-4xl font-bold text-primary mb-4">Add a Medical Tutor</h1>
-      <p className="text-on-surface-variant font-medium">Add Tutor Page (Phase 12)</p>
-    </div>
-  );
-}
-
 function MyBookingsPlaceholder() {
   useDocumentTitle('My Bookings');
   return (
@@ -67,7 +58,7 @@ function App() {
         element={
           <PrivateRoute>
             <Layout>
-              <AddTutorPlaceholder />
+              <AddTutor />
             </Layout>
           </PrivateRoute>
         }

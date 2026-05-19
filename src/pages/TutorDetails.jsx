@@ -11,7 +11,10 @@ export default function TutorDetails() {
   const { user } = useAuth();
   
   // Find tutor by ID
-  const tutor = mockTutors.find((t) => t.id === id);
+  const tutor = (() => {
+    const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
+    return [...customTutors, ...mockTutors].find((t) => t.id === id);
+  })();
   useDocumentTitle(tutor ? `${tutor.name} Profile` : 'Tutor Details');
 
   // Modal State
