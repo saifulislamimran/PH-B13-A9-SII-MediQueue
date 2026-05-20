@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactLenis } from '@studio-freight/react-lenis';
+import { ReactLenis } from 'lenis/react';
 
 /**
  * SmoothScroll component wraps the app context in Lenis to enable silky smooth momentum scroll.
