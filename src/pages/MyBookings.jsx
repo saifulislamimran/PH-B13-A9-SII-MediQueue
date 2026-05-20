@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useDocumentTitle from '../hooks/useDocumentTitle';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 export default function MyBookings() {
@@ -364,137 +365,165 @@ export default function MyBookings() {
       </div>
 
       {/* Reschedule Modal Overlay */}
-      {isRescheduleOpen && selectedBooking && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl p-6 border border-outline-variant/30 dark:border-slate-700 shadow-2xl relative animate-in fade-in zoom-in duration-200">
-            <button
-              onClick={() => setIsRescheduleOpen(false)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+      <AnimatePresence>
+        {isRescheduleOpen && selectedBooking && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 15 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl p-6 border border-outline-variant/30 dark:border-slate-700 shadow-2xl relative"
             >
-              <span className="material-symbols-outlined text-[22px]">close</span>
-            </button>
+              <button
+                onClick={() => setIsRescheduleOpen(false)}
+                className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+              >
+                <span className="material-symbols-outlined text-[22px]">close</span>
+              </button>
 
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Reschedule Session</h2>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-6">
-              Update the schedule parameters for your session with {selectedBooking.tutorName}.
-            </p>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Reschedule Session</h2>
+              <p className="text-xs text-gray-600 dark:text-gray-300 mb-6">
+                Update the schedule parameters for your session with {selectedBooking.tutorName}.
+              </p>
 
-            <form onSubmit={handleRescheduleSubmit} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">New Appointment Date</label>
-                <input
-                  type="date"
-                  required
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
-                  value={newDate}
-                  onChange={(e) => setNewDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-              
-              <div>
-                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">New Time Slot</label>
-                <select
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
-                  value={newTime}
-                  onChange={(e) => setNewTime(e.target.value)}
-                >
-                  <option value="09:00 AM">09:00 AM - 10:00 AM</option>
-                  <option value="10:00 AM">10:00 AM - 11:00 AM</option>
-                  <option value="11:00 AM">11:00 AM - 12:00 PM</option>
-                  <option value="02:00 PM">02:00 PM - 03:00 PM</option>
-                  <option value="04:00 PM">04:00 PM - 05:00 PM</option>
-                </select>
-              </div>
+              <form onSubmit={handleRescheduleSubmit} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">New Appointment Date</label>
+                  <input
+                    type="date"
+                    required
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
+                    value={newDate}
+                    onChange={(e) => setNewDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">New Time Slot</label>
+                  <select
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
+                    value={newTime}
+                    onChange={(e) => setNewTime(e.target.value)}
+                  >
+                    <option value="09:00 AM">09:00 AM - 10:00 AM</option>
+                    <option value="10:00 AM">10:00 AM - 11:00 AM</option>
+                    <option value="11:00 AM">11:00 AM - 12:00 PM</option>
+                    <option value="02:00 PM">02:00 PM - 03:00 PM</option>
+                    <option value="04:00 PM">04:00 PM - 05:00 PM</option>
+                  </select>
+                </div>
 
-              <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-700">
-                <button
-                  type="button"
-                  onClick={() => setIsRescheduleOpen(false)}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-900 dark:text-white rounded-lg text-xs font-bold transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-primary text-on-secondary rounded-lg text-xs font-bold flex items-center gap-1 shadow-md hover:opacity-90 transition-all"
-                >
-                  Confirm Changes
-                  <span className="material-symbols-outlined text-[14px]">calendar_today</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+                <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setIsRescheduleOpen(false)}
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-900 dark:text-white rounded-lg text-xs font-bold transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-primary text-on-secondary rounded-lg text-xs font-bold flex items-center gap-1 shadow-md hover:opacity-90 transition-all"
+                  >
+                    Confirm Changes
+                    <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Review Feedback Modal */}
-      {isReviewOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl p-6 border border-outline-variant/30 dark:border-slate-700 shadow-2xl relative animate-in fade-in zoom-in duration-200">
-            <button
-              onClick={() => setIsReviewOpen(false)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+      <AnimatePresence>
+        {isReviewOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 15 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl p-6 border border-outline-variant/30 dark:border-slate-700 shadow-2xl relative"
             >
-              <span className="material-symbols-outlined text-[22px]">close</span>
-            </button>
+              <button
+                onClick={() => setIsReviewOpen(false)}
+                className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+              >
+                <span className="material-symbols-outlined text-[22px]">close</span>
+              </button>
 
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Write a Review</h2>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-6">
-              Rate your educational session with {reviewTutorName} to help other medical students.
-            </p>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Write a Review</h2>
+              <p className="text-xs text-gray-600 dark:text-gray-300 mb-6">
+                Rate your educational session with {reviewTutorName} to help other medical students.
+              </p>
 
-            <form onSubmit={handleReviewSubmit} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-2">Select Rating</label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      className="text-primary dark:text-primary-fixed-dim"
-                    >
-                      <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: `'FILL' ${star <= rating ? 1 : 0}` }}>
-                        star
-                      </span>
-                    </button>
-                  ))}
+              <form onSubmit={handleReviewSubmit} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-2">Select Rating</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        className="text-primary dark:text-primary-fixed-dim"
+                      >
+                        <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: "'FILL' " + (star <= rating ? 1 : 0) }}>
+                          star
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Your Feedback</label>
-                <textarea
-                  rows="3"
-                  required
-                  placeholder="Share details of your experience, the tutor's style, and what you liked..."
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                ></textarea>
-              </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Your Feedback</label>
+                  <textarea
+                    rows="3"
+                    required
+                    placeholder="Share details of your experience, the tutor's style, and what you liked..."
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                  ></textarea>
+                </div>
 
-              <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-700">
-                <button
-                  type="button"
-                  onClick={() => setIsReviewOpen(false)}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-900 dark:text-white rounded-lg text-xs font-bold transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-primary text-on-secondary rounded-lg text-xs font-bold flex items-center gap-1 shadow-md hover:opacity-90 transition-all"
-                >
-                  Publish Review
-                  <span className="material-symbols-outlined text-[14px]">publish</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+                <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setIsReviewOpen(false)}
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-900 dark:text-white rounded-lg text-xs font-bold transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-primary text-on-secondary rounded-lg text-xs font-bold flex items-center gap-1 shadow-md hover:opacity-90 transition-all"
+                  >
+                    Publish Review
+                    <span className="material-symbols-outlined text-[14px]">publish</span>
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
