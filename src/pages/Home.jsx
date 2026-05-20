@@ -17,24 +17,24 @@ export default function Home() {
   return (
     <div className="flex-grow">
       {/* 1. Hero / Banner Section */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-white dark:bg-slate-950">
         <div className="absolute inset-0 z-0">
           <img
             alt="Medical team collaborating"
             className="w-full h-full object-cover"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuDARDnykd9IqkUDBIgqIkid1Pb4g1op62_pMu7qfU4XlFewzdVBW5sXFVoEl9cIpITGiNMu0e_cOxJPQhpumw7ceXCkyp7P85cGnoKm4S-p7NuiqPPZBNhLG0eFt99kAZXk3lvsnd7AVpZgU33QpWIJBNyLsCHBB8-GTFFYQrdIWUnpIp0G8aOGGmQSNiDDQ0DriHVJTiZTV3ivzPLVvMrVKQrIBu5xhmfqLGuxlEhdiBhr__TtXy63C--oOe6DbpmjOSZ1MHni_oE"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent dark:from-on-surface dark:via-on-surface/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-white/20 dark:from-slate-950 dark:via-slate-950/95 dark:to-transparent"></div>
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
           <div className="max-w-2xl animate-fade-in-up">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary dark:text-primary-fixed-dim font-label-md text-label-md mb-6 border border-primary/20">
               Elite Medical Tutoring
             </span>
-            <h1 className="font-display-lg text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface mb-6 leading-tight">
+            <h1 className="font-display-lg text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
               Find Your Perfect <span className="text-primary dark:text-primary-fixed-dim">Medical Tutor</span>
             </h1>
-            <p className="font-body-lg text-lg text-on-surface-variant dark:text-surface-variant mb-10 leading-relaxed">
+            <p className="font-body-lg text-lg text-gray-700 dark:text-gray-200 mb-10 leading-relaxed">
               Connect with experienced doctors and medical students for personalized 1-on-1 sessions. Master USMLE, MCAT, and clinical rotations with precision.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -56,17 +56,17 @@ export default function Home() {
       </section>
 
       {/* 2. Available Tutors Catalog Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-surface-container-lowest" id="tutors">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-slate-900" id="tutors">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div>
-              <h2 className="font-headline-lg text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Meet Our Expert Tutors</h2>
+              <h2 className="font-headline-lg text-3xl font-bold text-gray-900 dark:text-white mb-2">Meet Our Expert Tutors</h2>
               <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300">Highly rated professionals from top medical institutions.</p>
             </div>
             <div className="flex gap-2">
               <Link
                 to="/tutors"
-                className="px-6 py-3 bg-surface-container-high text-on-surface-variant dark:bg-inverse-surface/40 dark:text-inverse-on-surface rounded-xl font-label-md text-label-md hover:bg-surface-container-highest transition-colors flex items-center gap-2"
+                className="px-6 py-3 bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-gray-200 rounded-xl font-label-md text-label-md hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
               >
                 View All Tutors
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -79,7 +79,7 @@ export default function Home() {
             {previewTutors.map((tutor) => (
               <div
                 key={tutor.id}
-                className="group bg-white dark:bg-slate-800 rounded-3xl p-6 tutor-card-shadow border border-outline-variant/30 dark:border-white/10 hover:border-primary/30 dark:hover:border-primary-fixed-dim/30 transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col"
+                className="group bg-white dark:bg-slate-800 rounded-3xl p-6 tutor-card-shadow border border-outline-variant/30 dark:border-slate-700 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col"
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/10 shrink-0 relative bg-primary/5 flex items-center justify-center">
@@ -103,22 +103,22 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 mb-6 h-12 overflow-hidden">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {tutor.subjects.map((sub, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 rounded-full text-xs font-semibold"
+                      className="inline-flex items-center justify-center px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 rounded-full text-xs font-semibold"
                     >
                       {sub}
                     </span>
                   ))}
                 </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 line-clamp-2 h-10">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 line-clamp-2">
                   {tutor.description}
                 </p>
 
-                <div className="flex items-center justify-between pt-6 border-t border-outline-variant/30 dark:border-white/10 mt-auto">
+                <div className="flex items-center justify-between pt-6 border-t border-outline-variant/30 dark:border-slate-700 mt-auto">
                   <span className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100">
                     ${tutor.price}
                     <span className="text-gray-500 dark:text-gray-400 text-label-md font-normal">/hr</span>
@@ -137,43 +137,43 @@ export default function Home() {
       </section>
 
       {/* 3. How it Works Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-surface" id="how-it-works">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-950" id="how-it-works">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 animate-fade-in">
-            <h2 className="font-headline-lg text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Start Your Learning Journey</h2>
+            <h2 className="font-headline-lg text-3xl font-bold text-gray-900 dark:text-white mb-4">Start Your Learning Journey</h2>
             <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
               Three simple steps to achieve clinical and academic excellence with MediQueue.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
-            <div className="relative p-10 bg-surface-container-low dark:bg-slate-800 rounded-3xl text-center group border border-outline-variant/10 h-full flex flex-col">
+            <div className="relative p-10 bg-white dark:bg-slate-800 rounded-3xl text-center group border border-outline-variant/10 dark:border-slate-700 h-full flex flex-col shadow-sm">
               <div className="w-16 h-16 bg-primary text-on-secondary rounded-2xl flex items-center justify-center mx-auto mb-8 transform group-hover:rotate-6 transition-transform shrink-0">
                 <span className="material-symbols-outlined text-3xl">search</span>
               </div>
-              <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100 mb-4">1. Search Tutors</h3>
+              <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-white mb-4">1. Search Tutors</h3>
               <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 mt-auto">
                 Filter by specialty, institution, and availability to find your perfect match.
               </p>
-              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-px bg-outline-variant"></div>
+              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-px bg-outline-variant dark:bg-slate-700"></div>
             </div>
             {/* Step 2 */}
-            <div className="relative p-10 bg-surface-container-low dark:bg-slate-800 rounded-3xl text-center group border border-outline-variant/10 h-full flex flex-col">
+            <div className="relative p-10 bg-white dark:bg-slate-800 rounded-3xl text-center group border border-outline-variant/10 dark:border-slate-700 h-full flex flex-col shadow-sm">
               <div className="w-16 h-16 bg-secondary text-on-secondary rounded-2xl flex items-center justify-center mx-auto mb-8 transform group-hover:-rotate-6 transition-transform shrink-0">
                 <span className="material-symbols-outlined text-3xl">event_available</span>
               </div>
-              <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100 mb-4">2. Book a Session</h3>
+              <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-white mb-4">2. Book a Session</h3>
               <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 mt-auto">
                 Schedule a 1-on-1 session that fits perfectly into your demanding schedule.
               </p>
-              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-px bg-outline-variant"></div>
+              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-px bg-outline-variant dark:bg-slate-700"></div>
             </div>
             {/* Step 3 */}
-            <div className="p-10 bg-surface-container-low dark:bg-slate-800 rounded-3xl text-center group border border-outline-variant/10 h-full flex flex-col">
+            <div className="p-10 bg-white dark:bg-slate-800 rounded-3xl text-center group border border-outline-variant/10 dark:border-slate-700 h-full flex flex-col shadow-sm">
               <div className="w-16 h-16 bg-primary-container text-on-primary-container rounded-2xl flex items-center justify-center mx-auto mb-8 transform group-hover:scale-110 transition-transform shrink-0">
                 <span className="material-symbols-outlined text-3xl">school</span>
               </div>
-              <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100 mb-4">3. Start Learning</h3>
+              <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-white mb-4">3. Start Learning</h3>
               <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 mt-auto">
                 Join the interactive classroom and accelerate your medical understanding.
               </p>

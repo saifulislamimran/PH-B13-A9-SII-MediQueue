@@ -103,7 +103,7 @@ export default function TutorDetails() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-6 bg-surface-container-lowest relative">
+    <div className="min-h-screen py-12 px-6 bg-surface-container-lowest dark:bg-slate-900 relative">
       <div className="max-w-5xl mx-auto">
         
         {/* Back Button */}
@@ -120,7 +120,7 @@ export default function TutorDetails() {
           
           {/* Left Column: Profile Card */}
           <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white dark:bg-inverse-surface/10 rounded-3xl p-8 border border-outline-variant/30 dark:border-white/10 shadow-sm">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-outline-variant/30 dark:border-slate-700 shadow-sm">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 text-center sm:text-left">
                 <div className="w-32 h-32 rounded-3xl overflow-hidden border-2 border-primary/20 bg-primary/5 flex items-center justify-center shrink-0">
                   {tutor.image ? (
@@ -133,33 +133,33 @@ export default function TutorDetails() {
                   <span className="inline-block px-3 py-1 bg-primary/10 text-primary dark:text-primary-fixed-dim rounded-full text-xs font-bold">
                     Verified Instructor
                   </span>
-                  <h1 className="text-3xl font-bold text-on-surface dark:text-inverse-on-surface">
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                     {tutor.name}
                   </h1>
-                  <p className="text-on-surface-variant dark:text-surface-variant font-semibold">
+                  <p className="text-gray-600 dark:text-gray-300 font-semibold">
                     {tutor.institution}
                   </p>
                   <div className="flex items-center justify-center sm:justify-start text-primary dark:text-primary-fixed-dim">
                     <span className="material-symbols-outlined text-lg fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                    <span className="font-semibold ml-1">{tutor.rating} ({tutor.reviewsCount} reviews)</span>
+                    <span className="font-semibold ml-1 text-gray-900 dark:text-white">{tutor.rating} ({tutor.reviewsCount} reviews)</span>
                   </div>
                 </div>
               </div>
 
-              <div className="border-t border-outline-variant/30 dark:border-white/10 pt-6">
-                <h2 className="text-lg font-bold text-on-surface mb-3">About Tutor</h2>
-                <p className="text-on-surface-variant dark:text-surface-variant leading-relaxed">
+              <div className="border-t border-outline-variant/30 dark:border-slate-700 pt-6">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">About Tutor</h2>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   {tutor.description}
                 </p>
               </div>
 
-              <div className="border-t border-outline-variant/30 dark:border-white/10 pt-6 mt-6">
-                <h2 className="text-lg font-bold text-on-surface mb-3">Specialty Disciplines</h2>
+              <div className="border-t border-outline-variant/30 dark:border-slate-700 pt-6 mt-6">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Specialty Disciplines</h2>
                 <div className="flex flex-wrap gap-2">
                   {tutor.subjects.map((sub, idx) => (
                     <span
                       key={idx}
-                      className="px-4 py-2 bg-primary/5 text-primary dark:bg-primary-fixed-dim/10 dark:text-primary-fixed-dim rounded-xl text-sm font-semibold border border-primary/10"
+                      className="inline-flex items-center justify-center px-4 py-2 bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-200 rounded-xl text-sm font-semibold border border-blue-100 dark:border-blue-800/40"
                     >
                       {sub}
                     </span>
@@ -169,13 +169,13 @@ export default function TutorDetails() {
             </div>
 
             {/* Simulated Reviews Section */}
-            <div className="bg-white dark:bg-inverse-surface/10 rounded-3xl p-8 border border-outline-variant/30 dark:border-white/10 shadow-sm">
-              <h2 className="text-xl font-bold text-on-surface mb-6">Student Feedback</h2>
+            <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-outline-variant/30 dark:border-slate-700 shadow-sm">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Student Feedback</h2>
               <div className="space-y-6">
-                <div className="border-b border-outline-variant/20 pb-6">
+                <div className="border-b border-outline-variant/20 dark:border-slate-700 pb-6">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold text-on-surface">Michael R. (USMLE Student)</span>
-                    <div className="flex text-primary">
+                    <span className="font-bold text-gray-900 dark:text-white">Michael R. (USMLE Student)</span>
+                    <div className="flex text-primary dark:text-primary-fixed-dim">
                       <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                       <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                       <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
@@ -183,14 +183,14 @@ export default function TutorDetails() {
                       <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                     </div>
                   </div>
-                  <p className="text-sm text-on-surface-variant dark:text-surface-variant">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     "Exceptional tutor. Simplified complex physiological processes into simple visual concepts that I had struggled with for weeks."
                   </p>
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold text-on-surface">Lisa K. (MS-2)</span>
-                    <div className="flex text-primary">
+                    <span className="font-bold text-gray-900 dark:text-white">Lisa K. (MS-2)</span>
+                    <div className="flex text-primary dark:text-primary-fixed-dim">
                       <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                       <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                       <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
@@ -198,7 +198,7 @@ export default function TutorDetails() {
                       <span className="material-symbols-outlined text-sm">star</span>
                     </div>
                   </div>
-                  <p className="text-sm text-on-surface-variant dark:text-surface-variant">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     "Very patient. Helped me review mock board questions step-by-step and taught me how to read clinical vignettes efficiently."
                   </p>
                 </div>
@@ -207,26 +207,26 @@ export default function TutorDetails() {
           </div>
 
           {/* Right Column: Pricing & Booking Widget */}
-          <div className="bg-white dark:bg-inverse-surface/10 rounded-3xl p-8 border border-outline-variant/30 dark:border-white/10 shadow-sm space-y-6 lg:sticky lg:top-24">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-outline-variant/30 dark:border-slate-700 shadow-sm space-y-6 lg:sticky lg:top-24">
             <div>
-              <span className="text-xs font-semibold text-outline uppercase tracking-widest block mb-1">Session Rate</span>
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest block mb-1">Session Rate</span>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-extrabold text-on-surface">${tutor.price}</span>
-                <span className="text-on-surface-variant dark:text-surface-variant font-medium">/ hour</span>
+                <span className="text-4xl font-extrabold text-gray-900 dark:text-white">${tutor.price}</span>
+                <span className="text-gray-600 dark:text-gray-300 font-medium">/ hour</span>
               </div>
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-outline-variant/30">
-              <div className="flex items-center gap-3 text-sm text-on-surface-variant dark:text-surface-variant">
-                <span className="material-symbols-outlined text-primary text-xl">schedule</span>
+            <div className="space-y-3 pt-4 border-t border-outline-variant/30 dark:border-slate-700">
+              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-xl">schedule</span>
                 <span>Average response: <strong>2 hours</strong></span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-on-surface-variant dark:text-surface-variant">
-                <span className="material-symbols-outlined text-primary text-xl">language</span>
+              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-xl">language</span>
                 <span>Instruction in: <strong>English</strong></span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-on-surface-variant dark:text-surface-variant">
-                <span className="material-symbols-outlined text-primary text-xl">verified</span>
+              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-xl">verified</span>
                 <span>Credential Status: <strong>Cleared</strong></span>
               </div>
             </div>
@@ -247,19 +247,19 @@ export default function TutorDetails() {
       {/* Booking Modal Overlay */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-surface dark:bg-inverse-surface rounded-3xl p-6 md:p-8 border border-outline-variant/30 dark:border-white/10 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 border border-outline-variant/30 dark:border-slate-700 shadow-2xl relative animate-in fade-in zoom-in duration-200">
             
             {/* Close Button */}
             <button
               onClick={handleCloseModal}
-              className="absolute right-4 top-4 text-outline hover:text-on-surface transition-colors"
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
             >
               <span className="material-symbols-outlined text-[24px]">close</span>
             </button>
 
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-on-surface mb-2">Book Your Session</h2>
-              <p className="text-xs text-on-surface-variant dark:text-surface-variant">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Book Your Session</h2>
+              <p className="text-xs text-gray-600 dark:text-gray-300">
                 Configure your appointment with the medical specialist below.
               </p>
             </div>
@@ -267,7 +267,7 @@ export default function TutorDetails() {
             <form onSubmit={handleConfirmBooking} className="space-y-4">
               
               {/* Tutor Info Group */}
-              <div className="p-4 bg-primary/5 dark:bg-primary-fixed-dim/5 rounded-2xl flex items-center gap-3 border border-primary/10">
+              <div className="p-4 bg-primary/5 dark:bg-slate-700/50 rounded-2xl flex items-center gap-3 border border-primary/10 dark:border-slate-600">
                 <div className="w-12 h-12 rounded-full overflow-hidden border border-primary/10 bg-primary/10 flex items-center justify-center shrink-0">
                   {tutor.image ? (
                     <img alt={tutor.name} className="w-full h-full object-cover" src={tutor.image} />
@@ -276,7 +276,7 @@ export default function TutorDetails() {
                   )}
                 </div>
                 <div>
-                  <h4 className="font-bold text-on-surface text-sm">{tutor.name}</h4>
+                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">{tutor.name}</h4>
                   <p className="text-xs text-primary dark:text-primary-fixed-dim font-bold">
                     ${tutor.price}/hr • {tutor.institution}
                   </p>
@@ -286,20 +286,20 @@ export default function TutorDetails() {
               {/* Student Details (Read-only) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-on-surface-variant block mb-1">Student Name</label>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Student Name</label>
                   <input
                     type="text"
                     readOnly
-                    className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs font-semibold text-on-surface/80 cursor-not-allowed outline-none"
+                    className="w-full px-3 py-2 bg-gray-100 dark:bg-slate-700/50 border border-outline-variant/40 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-800 dark:text-gray-200 cursor-not-allowed outline-none"
                     value={user.displayName || 'Authenticated Student'}
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-on-surface-variant block mb-1">Student Email</label>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Student Email</label>
                   <input
                     type="text"
                     readOnly
-                    className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs font-semibold text-on-surface/80 cursor-not-allowed outline-none"
+                    className="w-full px-3 py-2 bg-gray-100 dark:bg-slate-700/50 border border-outline-variant/40 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-800 dark:text-gray-200 cursor-not-allowed outline-none"
                     value={user.email}
                   />
                 </div>
@@ -307,9 +307,9 @@ export default function TutorDetails() {
 
               {/* Subject dropdown */}
               <div>
-                <label className="text-xs font-bold text-on-surface-variant block mb-1">Topic / Subject Focus</label>
+                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Topic / Subject Focus</label>
                 <select
-                  className="w-full px-3 py-2 bg-surface dark:bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-on-surface"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                   value={selectedSubject}
                   onChange={(e) => setSelectedSubject(e.target.value)}
                 >
@@ -322,20 +322,20 @@ export default function TutorDetails() {
               {/* Date & Time Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-on-surface-variant block mb-1">Appointment Date</label>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Appointment Date</label>
                   <input
                     type="date"
                     required
-                    className="w-full px-3 py-2 bg-surface dark:bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-on-surface outline-none focus:ring-1 focus:ring-primary"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                     value={bookingDate}
                     onChange={(e) => setBookingDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-on-surface-variant block mb-1">Select Time Slot</label>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Select Time Slot</label>
                   <select
-                    className="w-full px-3 py-2 bg-surface dark:bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-on-surface"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                     value={bookingTime}
                     onChange={(e) => setBookingTime(e.target.value)}
                   >
@@ -350,10 +350,10 @@ export default function TutorDetails() {
 
               {/* Custom Student Note */}
               <div>
-                <label className="text-xs font-bold text-on-surface-variant block mb-1">Study Focus / Notes</label>
+                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Study Focus / Notes</label>
                 <textarea
                   rows="3"
-                  className="w-full px-3 py-2 bg-surface dark:bg-surface-container-low border border-outline-variant rounded-lg text-xs font-medium text-on-surface outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                   placeholder="Describe your learning objectives, exam timelines, or specific questions you have..."
                   value={studentNote}
                   onChange={(e) => setStudentNote(e.target.value)}
@@ -361,11 +361,11 @@ export default function TutorDetails() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30">
+              <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="px-4 py-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg text-xs font-bold transition-all"
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-900 dark:text-white rounded-lg text-xs font-bold transition-all"
                   disabled={isSubmitting}
                 >
                   Cancel

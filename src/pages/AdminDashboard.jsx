@@ -47,7 +47,7 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen py-12 px-6 bg-surface-container-lowest">
+    <div className="min-h-screen py-12 px-6 bg-surface-container-lowest dark:bg-slate-900">
       <div className="max-w-6xl mx-auto">
         
         {/* Header */}
@@ -55,8 +55,8 @@ export default function AdminDashboard() {
           <span className="inline-block px-3 py-1 bg-primary/10 text-primary dark:text-primary-fixed-dim rounded-full text-xs font-bold mb-3">
             System Operations Panel
           </span>
-          <h1 className="text-3xl font-bold text-on-surface mb-2">Operations & Analytics</h1>
-          <p className="text-sm text-on-surface-variant dark:text-surface-variant">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Operations & Analytics</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Live monitor metrics mapping student demands, active course reservations, and catalog pricing averages.
           </p>
         </div>
@@ -65,52 +65,52 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           
           {/* Card 1: Total Tutors */}
-          <div className="bg-white dark:bg-inverse-surface/10 border border-outline-variant/30 rounded-3xl p-6 shadow-sm flex items-center gap-4">
+          <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-primary/10 text-primary dark:text-primary-fixed-dim rounded-2xl flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[28px]">groups</span>
             </div>
             <div>
-              <span className="text-xs font-semibold text-outline block">Active Instructors</span>
-              <span className="text-3xl font-extrabold text-on-surface">{stats.tutorCount}</span>
-              <span className="text-[10px] text-primary block font-medium">({stats.customCount} user-added)</span>
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block">Active Instructors</span>
+              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{stats.tutorCount}</span>
+              <span className="text-[10px] text-primary dark:text-primary-fixed-dim block font-semibold">({stats.customCount} user-added)</span>
             </div>
           </div>
 
           {/* Card 2: Total Bookings */}
-          <div className="bg-white dark:bg-inverse-surface/10 border border-outline-variant/30 rounded-3xl p-6 shadow-sm flex items-center gap-4">
+          <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[28px]">event_available</span>
             </div>
             <div>
-              <span className="text-xs font-semibold text-outline block">Total Reservations</span>
-              <span className="text-3xl font-extrabold text-on-surface">{stats.totalBookings}</span>
-              <span className="text-[10px] text-secondary block font-medium">
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block">Total Reservations</span>
+              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{stats.totalBookings}</span>
+              <span className="text-[10px] text-secondary block font-semibold">
                 ({stats.scheduled} scheduled, {stats.rescheduled} rescheduled)
               </span>
             </div>
           </div>
 
           {/* Card 3: Avg Hourly Rate */}
-          <div className="bg-white dark:bg-inverse-surface/10 border border-outline-variant/30 rounded-3xl p-6 shadow-sm flex items-center gap-4">
+          <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-green-500/10 text-green-600 rounded-2xl flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[28px]">payments</span>
             </div>
             <div>
-              <span className="text-xs font-semibold text-outline block">Avg Tutor Rate</span>
-              <span className="text-3xl font-extrabold text-on-surface">${stats.avgPrice}</span>
-              <span className="text-[10px] text-green-600 block font-medium">/ hour base</span>
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block">Avg Tutor Rate</span>
+              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">${stats.avgPrice}</span>
+              <span className="text-[10px] text-green-600 block font-semibold">/ hour base</span>
             </div>
           </div>
 
           {/* Card 4: Institutions */}
-          <div className="bg-white dark:bg-inverse-surface/10 border border-outline-variant/30 rounded-3xl p-6 shadow-sm flex items-center gap-4">
+          <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-amber-500/10 text-amber-600 rounded-2xl flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-[28px]">account_balance</span>
             </div>
             <div>
-              <span className="text-xs font-semibold text-outline block">Universities & Clinics</span>
-              <span className="text-3xl font-extrabold text-on-surface">{stats.institutionCount}</span>
-              <span className="text-[10px] text-amber-600 block font-medium">represented</span>
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block">Universities & Clinics</span>
+              <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{stats.institutionCount}</span>
+              <span className="text-[10px] text-amber-600 block font-semibold">represented</span>
             </div>
           </div>
 
@@ -120,9 +120,9 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Specialty Subject Distribution */}
-          <div className="lg:col-span-2 bg-white dark:bg-inverse-surface/10 border border-outline-variant/30 rounded-3xl p-6 md:p-8 shadow-sm">
-            <h2 className="text-xl font-bold text-on-surface mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">pie_chart</span>
+          <div className="lg:col-span-2 bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 md:p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim">pie_chart</span>
               Specialty Coverage Share
             </h2>
             <div className="space-y-4">
@@ -131,11 +131,11 @@ export default function AdminDashboard() {
                 return (
                   <div key={subject} className="space-y-1">
                     <div className="flex justify-between items-center text-xs font-bold">
-                      <span className="text-on-surface">{subject}</span>
-                      <span className="text-primary">{count} Tutors ({percentage}%)</span>
+                      <span className="text-gray-700 dark:text-gray-200">{subject}</span>
+                      <span className="text-primary dark:text-primary-fixed-dim">{count} Tutors ({percentage}%)</span>
                     </div>
                     {/* SVG progress bar */}
-                    <div className="w-full bg-surface-container-high rounded-full h-2 relative overflow-hidden">
+                    <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2 relative overflow-hidden">
                       <div
                         className="bg-primary h-full rounded-full transition-all duration-500"
                         style={{ width: `${percentage}%` }}
@@ -148,22 +148,22 @@ export default function AdminDashboard() {
           </div>
 
           {/* System Audit Information */}
-          <div className="bg-white dark:bg-inverse-surface/10 border border-outline-variant/30 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
-            <h2 className="text-xl font-bold text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">gavel</span>
+          <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim">gavel</span>
               Operational Logs
             </h2>
             
             <div className="space-y-4 text-xs">
-              <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/30">
-                <span className="font-bold text-primary block mb-1">JWT Security Validation</span>
-                <p className="text-on-surface-variant dark:text-surface-variant">
+              <div className="p-3 bg-gray-50 dark:bg-slate-700/50 rounded-xl border border-outline-variant/30 dark:border-slate-700">
+                <span className="font-bold text-primary dark:text-primary-fixed-dim block mb-1">JWT Security Validation</span>
+                <p className="text-gray-600 dark:text-gray-300">
                   Axios interceptor binds dynamic Authorization Bearer headers to all incoming/outgoing service loops.
                 </p>
               </div>
-              <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/30">
-                <span className="font-bold text-primary block mb-1">Firebase Syncing status</span>
-                <p className="text-on-surface-variant dark:text-surface-variant">
+              <div className="p-3 bg-gray-50 dark:bg-slate-700/50 rounded-xl border border-outline-variant/30 dark:border-slate-700">
+                <span className="font-bold text-primary dark:text-primary-fixed-dim block mb-1">Firebase Syncing status</span>
+                <p className="text-gray-600 dark:text-gray-300">
                   Initial observer active. Client cache retains secure token details to bypass page reload redirection events.
                 </p>
               </div>

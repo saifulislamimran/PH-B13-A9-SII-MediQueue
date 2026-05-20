@@ -147,11 +147,11 @@ export default function MyBookings() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-6 bg-surface-container-lowest">
+    <div className="min-h-screen py-12 px-6 bg-surface-container-lowest dark:bg-slate-900">
       <div className="max-w-6xl mx-auto">
         
         {/* Profile dashboard header */}
-        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 mb-12 border-b border-outline-variant/30 pb-8">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 mb-12 border-b border-outline-variant/30 dark:border-slate-700 pb-8">
           <div className="flex items-center gap-4 text-center md:text-left flex-col md:flex-row">
             <div className="w-16 h-16 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
               {user.photoURL ? (
@@ -161,8 +161,8 @@ export default function MyBookings() {
               )}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-on-surface">{user.displayName || 'Student Account'}</h1>
-              <p className="text-xs text-on-surface-variant dark:text-surface-variant font-semibold">{user.email}</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.displayName || 'Student Account'}</h1>
+              <p className="text-xs text-gray-600 dark:text-gray-300 font-semibold">{user.email}</p>
             </div>
           </div>
           
@@ -177,13 +177,13 @@ export default function MyBookings() {
         </div>
 
         {/* Tab Selection Row */}
-        <div className="flex gap-4 mb-8 border-b border-outline-variant/20 pb-4">
+        <div className="flex gap-4 mb-8 border-b border-outline-variant/20 dark:border-slate-700 pb-4">
           <button
             onClick={() => setActiveTab('bookings')}
             className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
               activeTab === 'bookings'
                 ? 'bg-primary text-on-secondary'
-                : 'text-on-surface-variant hover:bg-surface-container-high'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-surface-container-high dark:hover:bg-slate-800'
             }`}
           >
             <span className="material-symbols-outlined text-[18px]">event_upcoming</span>
@@ -194,7 +194,7 @@ export default function MyBookings() {
             className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
               activeTab === 'tutors'
                 ? 'bg-primary text-on-secondary'
-                : 'text-on-surface-variant hover:bg-surface-container-high'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-surface-container-high dark:hover:bg-slate-800'
             }`}
           >
             <span className="material-symbols-outlined text-[18px]">school</span>
@@ -210,7 +210,7 @@ export default function MyBookings() {
                 {bookings.map((booking) => (
                   <div
                     key={booking.bookingId}
-                    className="bg-white dark:bg-inverse-surface/10 border border-outline-variant/30 rounded-3xl p-6 shadow-sm flex flex-col justify-between"
+                    className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex flex-col justify-between"
                   >
                     <div>
                       {/* Tutor Info */}
@@ -223,31 +223,31 @@ export default function MyBookings() {
                           )}
                         </div>
                         <div>
-                          <h3 className="font-bold text-on-surface text-sm">{booking.tutorName}</h3>
-                          <p className="text-[11px] text-on-surface-variant dark:text-surface-variant font-semibold">
+                          <h3 className="font-bold text-gray-900 dark:text-white text-sm">{booking.tutorName}</h3>
+                          <p className="text-[11px] text-gray-600 dark:text-gray-300 font-semibold">
                             {booking.tutorInstitution}
                           </p>
                         </div>
                       </div>
 
                       {/* Appointment Details */}
-                      <div className="p-4 bg-surface-container-low dark:bg-inverse-surface/20 rounded-2xl space-y-2 mb-4">
+                      <div className="p-4 bg-gray-50 dark:bg-slate-700/50 rounded-2xl space-y-2 mb-4">
                         <div className="flex justify-between items-center text-xs">
-                          <span className="font-bold text-on-surface-variant">Subject:</span>
+                          <span className="font-bold text-gray-700 dark:text-gray-300">Subject:</span>
                           <span className="px-2 py-0.5 bg-primary/10 text-primary dark:text-primary-fixed-dim rounded font-semibold text-[10px]">
                             {booking.subject}
                           </span>
                         </div>
                         <div className="flex justify-between items-center text-xs">
-                          <span className="font-bold text-on-surface-variant">Date:</span>
-                          <span className="text-on-surface dark:text-inverse-on-surface font-semibold">{booking.appointmentDate}</span>
+                          <span className="font-bold text-gray-700 dark:text-gray-300">Date:</span>
+                          <span className="text-gray-900 dark:text-gray-100 font-semibold">{booking.appointmentDate}</span>
                         </div>
                         <div className="flex justify-between items-center text-xs">
-                          <span className="font-bold text-on-surface-variant">Time Slot:</span>
-                          <span className="text-on-surface dark:text-inverse-on-surface font-semibold">{booking.appointmentTime}</span>
+                          <span className="font-bold text-gray-700 dark:text-gray-300">Time Slot:</span>
+                          <span className="text-gray-900 dark:text-gray-100 font-semibold">{booking.appointmentTime}</span>
                         </div>
                         <div className="flex justify-between items-center text-xs">
-                          <span className="font-bold text-on-surface-variant">Session Status:</span>
+                          <span className="font-bold text-gray-700 dark:text-gray-300">Session Status:</span>
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                             booking.status === 'Rescheduled'
                               ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
@@ -259,17 +259,17 @@ export default function MyBookings() {
                       </div>
 
                       {booking.note && (
-                        <p className="text-xs text-on-surface-variant dark:text-surface-variant italic mb-4 line-clamp-2">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 italic mb-4 line-clamp-2">
                           Note: "{booking.note}"
                         </p>
                       )}
                     </div>
 
                     {/* Actions Panel */}
-                    <div className="flex gap-2 justify-end border-t border-outline-variant/10 pt-4 mt-2">
+                    <div className="flex gap-2 justify-end border-t border-outline-variant/10 dark:border-slate-700 pt-4 mt-2">
                       <button
                         onClick={() => openReviewModal(booking.tutorId, booking.tutorName)}
-                        className="px-3.5 py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg text-xs font-bold transition-all flex items-center gap-1"
+                        className="px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-900 dark:text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1"
                       >
                         <span className="material-symbols-outlined text-[16px]">rate_review</span>
                         Review
@@ -293,10 +293,10 @@ export default function MyBookings() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 bg-white dark:bg-inverse-surface/10 rounded-3xl border border-dashed border-outline-variant/30 max-w-sm mx-auto p-6 shadow-sm">
+              <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-outline-variant/30 dark:border-slate-700 max-w-sm mx-auto p-6 shadow-sm">
                 <span className="material-symbols-outlined text-outline text-5xl mb-3">calendar_today</span>
-                <h3 className="text-lg font-bold text-on-surface mb-1">No Booked Sessions</h3>
-                <p className="text-on-surface-variant dark:text-surface-variant mb-6 text-xs">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">No Booked Sessions</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6 text-xs">
                   You haven't scheduled any sessions with our medical instructors yet.
                 </p>
                 <Link to="/tutors" className="px-5 py-2 bg-primary text-on-secondary rounded-xl font-bold text-xs">
@@ -315,7 +315,7 @@ export default function MyBookings() {
                 {myTutors.map((tutor) => (
                   <div
                     key={tutor.id}
-                    className="bg-white dark:bg-inverse-surface/10 border border-outline-variant/30 rounded-3xl p-6 shadow-sm flex items-center justify-between gap-4"
+                    className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex items-center justify-between gap-4"
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 rounded-full overflow-hidden bg-primary/10 border border-primary/10 flex items-center justify-center shrink-0">
@@ -326,15 +326,15 @@ export default function MyBookings() {
                         )}
                       </div>
                       <div>
-                        <h3 className="font-bold text-on-surface text-sm">{tutor.name}</h3>
-                        <p className="text-xs text-on-surface-variant dark:text-surface-variant mb-1 font-semibold">{tutor.institution}</p>
+                        <h3 className="font-bold text-gray-900 dark:text-white text-sm">{tutor.name}</h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-300 mb-1 font-semibold">{tutor.institution}</p>
                         <span className="px-2 py-0.5 bg-primary/10 text-primary dark:text-primary-fixed-dim rounded font-semibold text-[10px]">
                           {tutor.subjects[0]}
                         </span>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <span className="text-lg font-extrabold text-on-surface block">${tutor.price}/hr</span>
+                      <span className="text-lg font-extrabold text-gray-900 dark:text-white block">${tutor.price}/hr</span>
                       <Link
                         to={`/tutor/${tutor.id}`}
                         className="text-xs font-bold text-primary dark:text-primary-fixed-dim hover:underline flex items-center gap-1 justify-end mt-2"
@@ -347,10 +347,10 @@ export default function MyBookings() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 bg-white dark:bg-inverse-surface/10 rounded-3xl border border-dashed border-outline-variant/30 max-w-sm mx-auto p-6 shadow-sm">
+              <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-outline-variant/30 dark:border-slate-700 max-w-sm mx-auto p-6 shadow-sm">
                 <span className="material-symbols-outlined text-outline text-5xl mb-3">medical_services</span>
-                <h3 className="text-lg font-bold text-on-surface mb-1">Not Registered as Tutor</h3>
-                <p className="text-on-surface-variant dark:text-surface-variant mb-6 text-xs">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Not Registered as Tutor</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6 text-xs">
                   Listing your skills connects you with medical students globally.
                 </p>
                 <Link to="/add-tutor" className="px-5 py-2 bg-primary text-on-secondary rounded-xl font-bold text-xs">
@@ -366,26 +366,26 @@ export default function MyBookings() {
       {/* Reschedule Modal Overlay */}
       {isRescheduleOpen && selectedBooking && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-surface dark:bg-inverse-surface rounded-3xl p-6 border border-outline-variant/30 dark:border-white/10 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+          <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl p-6 border border-outline-variant/30 dark:border-slate-700 shadow-2xl relative animate-in fade-in zoom-in duration-200">
             <button
               onClick={() => setIsRescheduleOpen(false)}
-              className="absolute right-4 top-4 text-outline hover:text-on-surface"
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
             >
               <span className="material-symbols-outlined text-[22px]">close</span>
             </button>
 
-            <h2 className="text-xl font-bold text-on-surface mb-2">Reschedule Session</h2>
-            <p className="text-xs text-on-surface-variant dark:text-surface-variant mb-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Reschedule Session</h2>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mb-6">
               Update the schedule parameters for your session with {selectedBooking.tutorName}.
             </p>
 
             <form onSubmit={handleRescheduleSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-on-surface-variant block mb-1">New Appointment Date</label>
+                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">New Appointment Date</label>
                 <input
                   type="date"
                   required
-                  className="w-full px-3 py-2 bg-surface dark:bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-on-surface outline-none"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                   value={newDate}
                   onChange={(e) => setNewDate(e.target.value)}
                   min={new Date().toISOString().split('T')[0]}
@@ -393,9 +393,9 @@ export default function MyBookings() {
               </div>
               
               <div>
-                <label className="text-xs font-bold text-on-surface-variant block mb-1">New Time Slot</label>
+                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">New Time Slot</label>
                 <select
-                  className="w-full px-3 py-2 bg-surface dark:bg-surface-container-low border border-outline-variant rounded-lg text-xs font-semibold text-on-surface outline-none"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                   value={newTime}
                   onChange={(e) => setNewTime(e.target.value)}
                 >
@@ -407,11 +407,11 @@ export default function MyBookings() {
                 </select>
               </div>
 
-              <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30">
+              <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={() => setIsRescheduleOpen(false)}
-                  className="px-4 py-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg text-xs font-bold"
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-900 dark:text-white rounded-lg text-xs font-bold transition-all"
                 >
                   Cancel
                 </button>
@@ -431,22 +431,22 @@ export default function MyBookings() {
       {/* Review Feedback Modal */}
       {isReviewOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-surface dark:bg-inverse-surface rounded-3xl p-6 border border-outline-variant/30 dark:border-white/10 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+          <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl p-6 border border-outline-variant/30 dark:border-slate-700 shadow-2xl relative animate-in fade-in zoom-in duration-200">
             <button
               onClick={() => setIsReviewOpen(false)}
-              className="absolute right-4 top-4 text-outline hover:text-on-surface"
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
             >
               <span className="material-symbols-outlined text-[22px]">close</span>
             </button>
 
-            <h2 className="text-xl font-bold text-on-surface mb-2">Write a Review</h2>
-            <p className="text-xs text-on-surface-variant dark:text-surface-variant mb-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Write a Review</h2>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mb-6">
               Rate your educational session with {reviewTutorName} to help other medical students.
             </p>
 
             <form onSubmit={handleReviewSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-on-surface-variant block mb-2">Select Rating</label>
+                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-2">Select Rating</label>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -464,22 +464,22 @@ export default function MyBookings() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-on-surface-variant block mb-1">Your Feedback</label>
+                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Your Feedback</label>
                 <textarea
                   rows="3"
                   required
                   placeholder="Share details of your experience, the tutor's style, and what you liked..."
-                  className="w-full px-3 py-2 bg-surface dark:bg-surface-container-low border border-outline-variant rounded-lg text-xs font-medium text-on-surface outline-none"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
                 ></textarea>
               </div>
 
-              <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30">
+              <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={() => setIsReviewOpen(false)}
-                  className="px-4 py-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg text-xs font-bold"
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-900 dark:text-white rounded-lg text-xs font-bold transition-all"
                 >
                   Cancel
                 </button>

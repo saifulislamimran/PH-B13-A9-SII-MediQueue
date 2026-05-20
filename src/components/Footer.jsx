@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="bg-surface-container-highest dark:bg-inverse-surface w-full py-12 px-6 border-t border-outline-variant dark:border-white/10 transition-colors duration-300">
+    <footer className="bg-slate-50 dark:bg-slate-950 w-full py-12 px-6 border-t border-gray-200 dark:border-slate-800 transition-colors duration-300">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto">
         {/* Info Area */}
         <div className="space-y-6">
@@ -13,7 +13,7 @@ export default function Footer() {
               MediQueue
             </span>
           </div>
-          <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant leading-relaxed">
+          <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 leading-relaxed">
             Precision in medical tutoring. Empowering the next generation of physicians through expert mentorship.
           </p>
           {/* Social Icons including modern X logo */}
@@ -22,7 +22,7 @@ export default function Footer() {
               href="https://x.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-surface-container-high dark:bg-on-surface-variant/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-primary hover:text-on-secondary transition-all"
+              className="w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-800 flex items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-primary hover:text-on-secondary transition-all"
               aria-label="Visit our X profile"
             >
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -33,7 +33,7 @@ export default function Footer() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-surface-container-high dark:bg-on-surface-variant/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-primary hover:text-on-secondary transition-all"
+              className="w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-800 flex items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-primary hover:text-on-secondary transition-all"
               aria-label="Visit our Github profile"
             >
               <span className="material-symbols-outlined text-xl">hub</span>
@@ -42,7 +42,7 @@ export default function Footer() {
               href="https://mediqueue.edu"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-surface-container-high dark:bg-on-surface-variant/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-primary hover:text-on-secondary transition-all"
+              className="w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-800 flex items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-primary hover:text-on-secondary transition-all"
               aria-label="Visit our web platform"
             >
               <span className="material-symbols-outlined text-xl">public</span>
@@ -52,25 +52,25 @@ export default function Footer() {
 
         {/* Services Area */}
         <div>
-          <h4 className="font-title-md text-title-md text-on-surface dark:text-inverse-on-surface mb-6">Services</h4>
+          <h4 className="font-title-md text-title-md text-gray-900 dark:text-white mb-6">Services</h4>
           <ul className="space-y-4">
             <li>
-              <a href="#" className="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">
+              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">
                 USMLE Prep
               </a>
             </li>
             <li>
-              <a href="#" className="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">
+              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">
                 MCAT Prep
               </a>
             </li>
             <li>
-              <a href="#" className="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">
+              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">
                 Clinical Skills
               </a>
             </li>
             <li>
-              <a href="#" className="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">
+              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">
                 Anatomy Lab
               </a>
             </li>
@@ -79,17 +79,17 @@ export default function Footer() {
 
         {/* Contact Area */}
         <div>
-          <h4 className="font-title-md text-title-md text-on-surface dark:text-inverse-on-surface mb-6">Contact</h4>
+          <h4 className="font-title-md text-title-md text-gray-900 dark:text-white mb-6">Contact</h4>
           <ul className="space-y-4">
-            <li className="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant">
+            <li className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
               <span className="material-symbols-outlined text-sm">mail</span>
               support@mediqueue.edu
             </li>
-            <li className="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant">
-              <span class="material-symbols-outlined text-sm">call</span>
+            <li className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
+              <span className="material-symbols-outlined text-sm">call</span>
               +1 (555) 0123
             </li>
-            <li className="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant">
+            <li className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
               <span className="material-symbols-outlined text-sm">location_on</span>
               Boston Medical Center, MA
             </li>
@@ -98,13 +98,13 @@ export default function Footer() {
 
         {/* Subscribe Area */}
         <div>
-          <h4 className="font-title-md text-title-md text-on-surface dark:text-inverse-on-surface mb-6">Subscribe</h4>
-          <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant mb-6">
+          <h4 className="font-title-md text-title-md text-gray-900 dark:text-white mb-6">Subscribe</h4>
+          <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 mb-6">
             Get exam tips and tutor highlights in your inbox.
           </p>
           <form onSubmit={(e) => e.preventDefault()} className="relative">
             <input
-              className="w-full bg-surface-container-high dark:bg-on-surface-variant/10 border-none rounded-xl py-3 pl-4 pr-12 focus:ring-2 focus:ring-primary text-on-surface dark:text-inverse-on-surface"
+              className="w-full bg-gray-200 dark:bg-slate-800 border-none rounded-xl py-3 pl-4 pr-12 focus:ring-2 focus:ring-primary text-gray-900 dark:text-white outline-none"
               placeholder="Email address"
               type="email"
               required
@@ -120,15 +120,15 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center gap-4">
-        <p className="text-on-surface-variant dark:text-surface-variant font-label-md text-label-md">
+      <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-gray-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p className="text-gray-600 dark:text-gray-300 font-label-md text-label-md">
           © {new Date().getFullYear()} MediQueue. Precision in medical tutoring.
         </p>
         <div className="flex gap-8 font-label-md text-label-md">
-          <a href="#" className="text-on-surface-variant dark:text-surface-variant hover:text-primary">
+          <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary">
             Privacy Policy
           </a>
-          <a href="#" className="text-on-surface-variant dark:text-surface-variant hover:text-primary">
+          <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary">
             Terms of Service
           </a>
         </div>

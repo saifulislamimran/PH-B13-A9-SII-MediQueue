@@ -37,10 +37,10 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 border-b border-outline-variant/30 dark:border-white/10 ${
+      className={`fixed top-0 w-full z-50 transition-all duration-300 border-b border-outline-variant/30 dark:border-slate-800 ${
         isScrolled
-          ? 'h-16 bg-surface/90 dark:bg-inverse-surface/90 shadow-md backdrop-blur-md'
-          : 'h-20 bg-surface/70 dark:bg-inverse-surface/70 backdrop-blur-md'
+          ? 'h-16 bg-white/95 dark:bg-slate-900/95 shadow-md backdrop-blur-md'
+          : 'h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md'
       }`}
     >
       <div className="flex justify-between items-center max-w-7xl mx-auto px-6 h-full">
@@ -60,7 +60,7 @@ export default function Navbar() {
               `font-semibold transition-colors duration-200 py-1 ${
                 isActive
                   ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
-                  : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-fixed-dim'
               }`
             }
           >
@@ -72,7 +72,7 @@ export default function Navbar() {
               `font-semibold transition-colors duration-200 py-1 ${
                 isActive
                   ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
-                  : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-fixed-dim'
               }`
             }
           >
@@ -87,7 +87,7 @@ export default function Navbar() {
                   `font-semibold transition-colors duration-200 py-1 ${
                     isActive
                       ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
-                      : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-fixed-dim'
                   }`
                 }
               >
@@ -99,7 +99,7 @@ export default function Navbar() {
                   `font-semibold transition-colors duration-200 py-1 ${
                     isActive
                       ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
-                      : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-fixed-dim'
                   }`
                 }
               >
@@ -111,7 +111,7 @@ export default function Navbar() {
                   `font-semibold transition-colors duration-200 py-1 ${
                     isActive
                       ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim'
-                      : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-fixed-dim'
                   }`
                 }
               >
@@ -126,10 +126,10 @@ export default function Navbar() {
           {/* Theme Toggler */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-surface-container transition-colors dark:hover:bg-on-surface-variant/20"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors dark:hover:bg-slate-800"
             aria-label="Toggle Theme"
           >
-            <span className="material-symbols-outlined text-on-surface-variant dark:text-surface-variant">
+            <span className="material-symbols-outlined text-gray-600 dark:text-gray-300">
               {theme === 'light' ? 'dark_mode' : 'light_mode'}
             </span>
           </button>
@@ -145,13 +145,13 @@ export default function Navbar() {
                     <span className="material-symbols-outlined text-primary text-xl">person</span>
                   )}
                 </div>
-                <span className="text-xs font-bold text-on-surface truncate max-w-[100px]">
+                <span className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate max-w-[100px]">
                   {user.displayName || 'Doc'}
                 </span>
               </div>
               <button
                 onClick={handleLogout}
-                className="px-4 py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-full font-label-md text-label-md font-semibold transition-colors active:scale-95 flex items-center gap-1"
+                className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-900 dark:text-white rounded-full font-label-md text-label-md font-semibold transition-colors active:scale-95 flex items-center gap-1"
               >
                 Logout
                 <span className="material-symbols-outlined text-sm">logout</span>
@@ -177,7 +177,7 @@ export default function Navbar() {
           {/* Mobile menu trigger */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-on-surface hover:bg-surface-container rounded-lg"
+            className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
           >
             <span className="material-symbols-outlined">
               {isMobileMenuOpen ? 'close' : 'menu'}
@@ -188,18 +188,18 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-surface dark:bg-inverse-surface border-b border-outline-variant/30 p-6 flex flex-col gap-4 shadow-lg">
+        <div className="md:hidden bg-white dark:bg-slate-900 border-b border-outline-variant/30 dark:border-slate-800 p-6 flex flex-col gap-4 shadow-lg">
           <Link
             to="/"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
+            className="text-gray-700 dark:text-gray-200 font-semibold py-2 border-b border-outline-variant/10 dark:border-slate-800"
           >
             Home
           </Link>
           <Link
             to="/tutors"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
+            className="text-gray-700 dark:text-gray-200 font-semibold py-2 border-b border-outline-variant/10 dark:border-slate-800"
           >
             Find Tutors
           </Link>
@@ -209,21 +209,21 @@ export default function Navbar() {
               <Link
                 to="/add-tutor"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
+                className="text-gray-700 dark:text-gray-200 font-semibold py-2 border-b border-outline-variant/10 dark:border-slate-800"
               >
                 Add Tutor
               </Link>
               <Link
                 to="/my-bookings"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
+                className="text-gray-700 dark:text-gray-200 font-semibold py-2 border-b border-outline-variant/10 dark:border-slate-800"
               >
                 My Bookings
               </Link>
               <Link
                 to="/admin"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-on-surface dark:text-inverse-on-surface font-semibold py-2 border-b border-outline-variant/10"
+                className="text-gray-700 dark:text-gray-200 font-semibold py-2 border-b border-outline-variant/10 dark:border-slate-800"
               >
                 System Stats
               </Link>
@@ -236,7 +236,7 @@ export default function Navbar() {
                       <span className="material-symbols-outlined text-primary text-xl">person</span>
                     )}
                   </div>
-                  <span className="text-sm font-bold text-on-surface">
+                  <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
                     {user.displayName || user.email}
                   </span>
                 </div>
@@ -245,7 +245,7 @@ export default function Navbar() {
                     setIsMobileMenuOpen(false);
                     handleLogout();
                   }}
-                  className="w-full text-center py-2.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-semibold flex items-center justify-center gap-1"
+                  className="w-full text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-900 dark:text-white rounded-xl font-semibold flex items-center justify-center gap-1"
                 >
                   Logout
                   <span className="material-symbols-outlined text-sm">logout</span>

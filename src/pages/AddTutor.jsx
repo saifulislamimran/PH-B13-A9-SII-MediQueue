@@ -72,15 +72,15 @@ export default function AddTutor() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-6 bg-surface-container-lowest flex items-center justify-center">
-      <div className="w-full max-w-2xl bg-white dark:bg-inverse-surface/10 rounded-3xl p-8 md:p-10 border border-outline-variant/30 dark:border-white/10 shadow-sm">
+    <div className="min-h-screen py-12 px-6 bg-surface-container-lowest dark:bg-slate-900 flex items-center justify-center">
+      <div className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-10 border border-outline-variant/30 dark:border-slate-700 shadow-sm">
         
         <div className="mb-8 text-center md:text-left">
           <span className="inline-block px-3 py-1 bg-primary/10 text-primary dark:text-primary-fixed-dim rounded-full text-xs font-bold mb-3">
             MediQueue Career Portal
           </span>
-          <h1 className="text-3xl font-bold text-on-surface mb-2">Register as a Tutor</h1>
-          <p className="text-sm text-on-surface-variant dark:text-surface-variant">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Register as a Tutor</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Submit your teaching credentials to help other students master their boards.
           </p>
         </div>
@@ -90,25 +90,25 @@ export default function AddTutor() {
           {/* Read-Only Identity Group */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-bold text-on-surface-variant block mb-1">Tutor Name (Verified)</label>
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Tutor Name (Verified)</label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">verified_user</span>
                 <input
                   type="text"
                   readOnly
-                  className="w-full pl-9 pr-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs font-semibold text-on-surface/85 cursor-not-allowed outline-none"
+                  className="w-full pl-9 pr-4 py-2.5 bg-gray-100 dark:bg-slate-700/50 border border-outline-variant/40 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-800 dark:text-gray-200 cursor-not-allowed outline-none"
                   value={user.displayName || 'Authorized Doctor'}
                 />
               </div>
             </div>
             <div>
-              <label className="text-xs font-bold text-on-surface-variant block mb-1">Tutor Email (Verified)</label>
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Tutor Email (Verified)</label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">mail</span>
                 <input
                   type="text"
                   readOnly
-                  className="w-full pl-9 pr-4 py-2.5 bg-surface-container-low border border-outline-variant/40 rounded-lg text-xs font-semibold text-on-surface/85 cursor-not-allowed outline-none"
+                  className="w-full pl-9 pr-4 py-2.5 bg-gray-100 dark:bg-slate-700/50 border border-outline-variant/40 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-800 dark:text-gray-200 cursor-not-allowed outline-none"
                   value={user.email}
                 />
               </div>
@@ -118,22 +118,22 @@ export default function AddTutor() {
           {/* Image & Subject Specialty Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-bold text-on-surface-variant block mb-1">Avatar Image URL</label>
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Avatar Image URL</label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">image</span>
                 <input
                   type="url"
                   placeholder="https://example.com/dr-john.jpg"
-                  className="w-full pl-9 pr-4 py-2.5 bg-surface border border-outline-variant rounded-lg text-xs font-semibold text-on-surface outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
                 />
               </div>
             </div>
             <div>
-              <label className="text-xs font-bold text-on-surface-variant block mb-1">Primary Specialty Subject</label>
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Primary Specialty Subject</label>
               <select
-                className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-xs font-semibold text-on-surface cursor-pointer outline-none"
+                className="w-full px-3 py-2.5 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white cursor-pointer outline-none focus:ring-1 focus:ring-primary"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
               >
@@ -154,21 +154,21 @@ export default function AddTutor() {
           {/* Institution & Rate Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-bold text-on-surface-variant block mb-1">Medical Institution</label>
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Medical Institution</label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">school</span>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Cleveland Clinic, Mayo Clinic"
-                  className="w-full pl-9 pr-4 py-2.5 bg-surface border border-outline-variant rounded-lg text-xs font-semibold text-on-surface outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                   value={institution}
                   onChange={(e) => setInstitution(e.target.value)}
                 />
               </div>
             </div>
             <div>
-              <label className="text-xs font-bold text-on-surface-variant block mb-1">Hourly Rate (USD)</label>
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Hourly Rate (USD)</label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">attach_money</span>
                 <input
@@ -176,7 +176,7 @@ export default function AddTutor() {
                   required
                   min="1"
                   placeholder="e.g. 75"
-                  className="w-full pl-9 pr-4 py-2.5 bg-surface border border-outline-variant rounded-lg text-xs font-semibold text-on-surface outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                 />
@@ -186,23 +186,23 @@ export default function AddTutor() {
 
           {/* Description biography */}
           <div>
-            <label className="text-xs font-bold text-on-surface-variant block mb-1">Teaching Credentials / Biography</label>
+            <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Teaching Credentials / Biography</label>
             <textarea
               rows="4"
               required
               placeholder="Tell students about your medical background, teaching methods, board score achievements, and schedule preferences (minimum 20 characters)..."
-              className="w-full px-3 py-2 bg-surface border border-outline-variant rounded-lg text-xs font-medium text-on-surface outline-none focus:ring-1 focus:ring-primary"
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             ></textarea>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 justify-end pt-4 border-t border-outline-variant/30">
+          <div className="flex gap-4 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-700">
             <button
               type="button"
               onClick={() => navigate('/tutors')}
-              className="px-5 py-2.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl text-xs font-bold transition-all"
+              className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-900 dark:text-white rounded-xl text-xs font-bold transition-all"
               disabled={isSubmitting}
             >
               Cancel

@@ -53,17 +53,17 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 relative overflow-hidden bg-gradient-to-br from-surface to-surface-container-high dark:from-inverse-surface dark:to-background">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 relative overflow-hidden bg-gradient-to-br from-surface to-surface-container-high dark:from-slate-900 dark:to-slate-950">
       {/* Background Orbs */}
       <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-secondary/5 rounded-full blur-3xl"></div>
 
       <div className="w-full max-w-[440px] z-10 animate-in fade-in zoom-in duration-500">
-        <div className="glass-card bg-surface-container-lowest/80 dark:bg-inverse-surface/90 border border-outline-variant/30 dark:border-white/10 p-8 md:p-10 rounded-2xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+        <div className="glass-card bg-white/90 dark:bg-slate-800/95 border border-outline-variant/30 dark:border-slate-700 p-8 md:p-10 rounded-2xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
           
           <div className="mb-8 text-center md:text-left">
-            <h1 className="font-headline-lg text-3xl font-bold text-on-surface mb-2">Welcome Back</h1>
-            <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant">
+            <h1 className="font-headline-lg text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Welcome Back</h1>
+            <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300">
               Login to access your medical tutoring dashboard.
             </p>
           </div>
@@ -71,15 +71,15 @@ export default function Login() {
           <form onSubmit={handleEmailLogin} className="space-y-6">
             {/* Email Field */}
             <div className="space-y-2">
-              <label className="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant block font-semibold" htmlFor="email">
+              <label className="font-label-md text-label-md text-gray-700 dark:text-gray-300 block font-semibold" htmlFor="email">
                 Email Address
               </label>
               <div className="relative group">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline dark:text-surface-variant">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline dark:text-gray-400">
                   mail
                 </span>
                 <input
-                  className="w-full pl-10 pr-4 py-3 bg-surface dark:bg-surface-container-low border border-outline-variant dark:border-white/10 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-body-md text-body-md text-on-surface dark:text-inverse-on-surface placeholder:text-outline/50"
+                  className="w-full pl-10 pr-4 py-3 bg-surface dark:bg-slate-700 border border-outline-variant dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-body-md text-body-md text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   id="email"
                   placeholder="dr.smith@university.edu"
                   type="email"
@@ -94,7 +94,7 @@ export default function Login() {
             {/* Password Field */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant block font-semibold" htmlFor="password">
+                <label className="font-label-md text-label-md text-gray-700 dark:text-gray-300 block font-semibold" htmlFor="password">
                   Password
                 </label>
                 <a href="#" className="font-label-md text-label-md text-primary dark:text-primary-fixed-dim hover:underline transition-all">
@@ -102,11 +102,11 @@ export default function Login() {
                 </a>
               </div>
               <div className="relative group">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline dark:text-surface-variant">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline dark:text-gray-400">
                   lock
                 </span>
                 <input
-                  className="w-full pl-10 pr-12 py-3 bg-surface dark:bg-surface-container-low border border-outline-variant dark:border-white/10 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-body-md text-body-md text-on-surface dark:text-inverse-on-surface placeholder:text-outline/50"
+                  className="w-full pl-10 pr-12 py-3 bg-surface dark:bg-slate-700 border border-outline-variant dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-body-md text-body-md text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   id="password"
                   placeholder="••••••••"
                   type={showPassword ? 'text' : 'password'}
@@ -116,7 +116,7 @@ export default function Login() {
                   disabled={isLoading}
                 />
                 <button
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface dark:hover:text-white transition-colors"
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
@@ -140,17 +140,17 @@ export default function Login() {
 
             {/* Divider */}
             <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t border-outline-variant dark:border-white/10"></div>
-              <span className="flex-shrink mx-4 font-label-sm text-label-sm text-outline dark:text-surface-variant uppercase tracking-wider">
+              <div className="flex-grow border-t border-outline-variant dark:border-slate-600"></div>
+              <span className="flex-shrink mx-4 font-label-sm text-label-sm text-outline dark:text-gray-400 uppercase tracking-wider">
                 Or continue with
               </span>
-              <div className="flex-grow border-t border-outline-variant dark:border-white/10"></div>
+              <div className="flex-grow border-t border-outline-variant dark:border-slate-600"></div>
             </div>
 
             {/* Social Login */}
             <button
               onClick={handleGoogleLogin}
-              className="w-full py-3 px-4 bg-surface dark:bg-surface-container-low border border-outline-variant dark:border-white/10 rounded-lg flex items-center justify-center gap-3 font-label-md text-label-md text-on-surface dark:text-inverse-on-surface hover:bg-surface-container-high transition-colors active:scale-[0.98] disabled:opacity-50"
+              className="w-full py-3 px-4 bg-surface dark:bg-slate-700 border border-outline-variant dark:border-slate-600 rounded-lg flex items-center justify-center gap-3 font-label-md text-label-md text-gray-900 dark:text-white hover:bg-surface-container-high dark:hover:bg-slate-600 transition-colors active:scale-[0.98] disabled:opacity-50"
               type="button"
               disabled={isLoading}
             >
@@ -165,7 +165,7 @@ export default function Login() {
 
           {/* Footer Link */}
           <div className="mt-10 text-center">
-            <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant">
+            <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300">
               Don't have an account?
               <Link to="/register" className="text-primary dark:text-primary-fixed-dim font-semibold hover:underline transition-all ml-1">
                 Register here
@@ -175,7 +175,7 @@ export default function Login() {
         </div>
 
         {/* Secure Indicators */}
-        <div className="mt-8 flex justify-center gap-6 opacity-60 text-on-surface dark:text-inverse-on-surface">
+        <div className="mt-8 flex justify-center gap-6 opacity-60 text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-1">
             <span className="material-symbols-outlined text-[18px]">verified_user</span>
             <span className="font-label-sm text-label-sm">Secure Portal</span>

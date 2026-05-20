@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-background text-on-surface transition-colors duration-300;
+    @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-white transition-colors duration-300;
   }
 }
 
@@ -47,4 +47,26 @@
 
 .dark ::-webkit-scrollbar-thumb {
   background: #454652;
+}
+
+/* Lenis Smooth Scroll Configuration */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis-scrolling iframe {
+  pointer-events: none;
 }
