@@ -80,8 +80,8 @@ export default function Tutors() {
     setSelectedDate('');
   };
 
-  return (
-    <div className="min-h-screen py-12 px-6 bg-surface-container-lowest">
+    return (
+    <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8 bg-surface-container-lowest">
       <div className="max-w-7xl mx-auto">
         
         {/* Page Header */}
@@ -177,7 +177,7 @@ export default function Tutors() {
             {filteredTutors.map((tutor) => (
               <div
                 key={tutor.id}
-                className="group bg-surface dark:bg-inverse-surface/20 rounded-3xl p-6 tutor-card-shadow border border-outline-variant/30 dark:border-white/10 hover:border-primary/30 dark:hover:border-primary-fixed-dim/30 transition-all duration-300 transform hover:-translate-y-1"
+                className="group bg-white dark:bg-slate-800 rounded-3xl p-6 tutor-card-shadow border border-outline-variant/30 dark:border-white/10 hover:border-primary/30 dark:hover:border-primary-fixed-dim/30 transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col"
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/10 shrink-0 relative bg-primary/5 flex items-center justify-center">
@@ -188,13 +188,13 @@ export default function Tutors() {
                     )}
                   </div>
                   <div>
-                    <h3 className="font-title-md text-title-md font-bold text-on-surface dark:text-inverse-on-surface">
+                    <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100">
                       {tutor.name}
                     </h3>
-                    <p className="text-xs text-on-surface-variant dark:text-surface-variant mb-1 font-semibold">
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mb-1 font-semibold">
                       {tutor.institution}
                     </p>
-                    <div className="flex items-center text-primary dark:text-primary-fixed-dim">
+                    <div className="flex items-center text-blue-600 dark:text-blue-400">
                       <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                       <span className="font-label-md text-label-md ml-1 font-semibold">
                         {tutor.rating} ({tutor.reviewsCount} reviews)
@@ -207,21 +207,21 @@ export default function Tutors() {
                   {tutor.subjects.map((sub, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 bg-primary/10 text-primary dark:bg-primary-fixed-dim/10 dark:text-primary-fixed-dim rounded-full text-xs font-semibold"
+                      className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 rounded-full text-xs font-semibold"
                     >
                       {sub}
                     </span>
                   ))}
                 </div>
 
-                <p className="text-sm text-on-surface-variant dark:text-surface-variant mb-6 line-clamp-2 h-10">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 line-clamp-2 h-10">
                   {tutor.description}
                 </p>
 
-                <div className="flex items-center justify-between pt-6 border-t border-outline-variant/30 dark:border-white/10">
-                  <span className="font-title-md text-title-md font-bold text-on-surface dark:text-inverse-on-surface">
+                <div className="flex items-center justify-between pt-6 border-t border-outline-variant/30 dark:border-white/10 mt-auto">
+                  <span className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100">
                     ${tutor.price}
-                    <span className="text-on-surface-variant dark:text-surface-variant text-label-md font-normal">/hr</span>
+                    <span className="text-gray-500 dark:text-gray-400 text-label-md font-normal">/hr</span>
                   </span>
                   <button
                     onClick={() => handleBookSession(tutor.id)}

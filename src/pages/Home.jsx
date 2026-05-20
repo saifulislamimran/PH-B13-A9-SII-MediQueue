@@ -26,7 +26,7 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent dark:from-on-surface dark:via-on-surface/90"></div>
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 md:py-32">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
           <div className="max-w-2xl animate-fade-in-up">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary dark:text-primary-fixed-dim font-label-md text-label-md mb-6 border border-primary/20">
               Elite Medical Tutoring
@@ -56,12 +56,12 @@ export default function Home() {
       </section>
 
       {/* 2. Available Tutors Catalog Section */}
-      <section className="py-24 px-6 bg-surface-container-lowest" id="tutors">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-surface-container-lowest" id="tutors">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div>
-              <h2 className="font-headline-lg text-3xl font-bold text-on-surface mb-2">Meet Our Expert Tutors</h2>
-              <p className="font-body-md text-body-md text-on-surface-variant">Highly rated professionals from top medical institutions.</p>
+              <h2 className="font-headline-lg text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Meet Our Expert Tutors</h2>
+              <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300">Highly rated professionals from top medical institutions.</p>
             </div>
             <div className="flex gap-2">
               <Link
@@ -79,7 +79,7 @@ export default function Home() {
             {previewTutors.map((tutor) => (
               <div
                 key={tutor.id}
-                className="group bg-surface dark:bg-inverse-surface/20 rounded-3xl p-6 tutor-card-shadow border border-outline-variant/30 dark:border-white/10 hover:border-primary/30 dark:hover:border-primary-fixed-dim/30 transition-all duration-300 transform hover:-translate-y-1"
+                className="group bg-white dark:bg-slate-800 rounded-3xl p-6 tutor-card-shadow border border-outline-variant/30 dark:border-white/10 hover:border-primary/30 dark:hover:border-primary-fixed-dim/30 transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col"
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/10 shrink-0 relative bg-primary/5 flex items-center justify-center">
@@ -90,13 +90,13 @@ export default function Home() {
                     )}
                   </div>
                   <div>
-                    <h3 className="font-title-md text-title-md font-bold text-on-surface dark:text-inverse-on-surface">
+                    <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100">
                       {tutor.name}
                     </h3>
-                    <p className="text-xs text-on-surface-variant dark:text-surface-variant mb-1 font-semibold">
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mb-1 font-semibold">
                       {tutor.institution}
                     </p>
-                    <div className="flex items-center text-primary dark:text-primary-fixed-dim">
+                    <div className="flex items-center text-blue-600 dark:text-blue-400">
                       <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                       <span className="font-label-md text-label-md ml-1 font-semibold">{tutor.rating} ({tutor.reviewsCount} reviews)</span>
                     </div>
@@ -107,21 +107,21 @@ export default function Home() {
                   {tutor.subjects.map((sub, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 bg-primary/10 text-primary dark:bg-primary-fixed-dim/10 dark:text-primary-fixed-dim rounded-full text-xs font-semibold"
+                      className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 rounded-full text-xs font-semibold"
                     >
                       {sub}
                     </span>
                   ))}
                 </div>
 
-                <p className="text-sm text-on-surface-variant dark:text-surface-variant mb-6 line-clamp-2 h-10">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 line-clamp-2 h-10">
                   {tutor.description}
                 </p>
 
-                <div className="flex items-center justify-between pt-6 border-t border-outline-variant/30 dark:border-white/10">
-                  <span className="font-title-md text-title-md font-bold text-on-surface dark:text-inverse-on-surface">
+                <div className="flex items-center justify-between pt-6 border-t border-outline-variant/30 dark:border-white/10 mt-auto">
+                  <span className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100">
                     ${tutor.price}
-                    <span className="text-on-surface-variant dark:text-surface-variant text-label-md font-normal">/hr</span>
+                    <span className="text-gray-500 dark:text-gray-400 text-label-md font-normal">/hr</span>
                   </span>
                   <button
                     onClick={() => handleBookSession(tutor.id)}
@@ -137,44 +137,44 @@ export default function Home() {
       </section>
 
       {/* 3. How it Works Section */}
-      <section className="py-24 px-6 bg-surface" id="how-it-works">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-surface" id="how-it-works">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 animate-fade-in">
-            <h2 className="font-headline-lg text-3xl font-bold text-on-surface mb-4">Start Your Learning Journey</h2>
-            <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant max-w-xl mx-auto">
+            <h2 className="font-headline-lg text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Start Your Learning Journey</h2>
+            <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
               Three simple steps to achieve clinical and academic excellence with MediQueue.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
-            <div className="relative p-10 bg-surface-container-low dark:bg-inverse-surface/10 rounded-3xl text-center group border border-outline-variant/10">
-              <div className="w-16 h-16 bg-primary text-on-secondary rounded-2xl flex items-center justify-center mx-auto mb-8 transform group-hover:rotate-6 transition-transform">
+            <div className="relative p-10 bg-surface-container-low dark:bg-slate-800 rounded-3xl text-center group border border-outline-variant/10 h-full flex flex-col">
+              <div className="w-16 h-16 bg-primary text-on-secondary rounded-2xl flex items-center justify-center mx-auto mb-8 transform group-hover:rotate-6 transition-transform shrink-0">
                 <span className="material-symbols-outlined text-3xl">search</span>
               </div>
-              <h3 className="font-title-md text-title-md font-bold text-on-surface dark:text-inverse-on-surface mb-4">1. Search Tutors</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant">
+              <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100 mb-4">1. Search Tutors</h3>
+              <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 mt-auto">
                 Filter by specialty, institution, and availability to find your perfect match.
               </p>
               <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-px bg-outline-variant"></div>
             </div>
             {/* Step 2 */}
-            <div className="relative p-10 bg-surface-container-low dark:bg-inverse-surface/10 rounded-3xl text-center group border border-outline-variant/10">
-              <div className="w-16 h-16 bg-secondary text-on-secondary rounded-2xl flex items-center justify-center mx-auto mb-8 transform group-hover:-rotate-6 transition-transform">
+            <div className="relative p-10 bg-surface-container-low dark:bg-slate-800 rounded-3xl text-center group border border-outline-variant/10 h-full flex flex-col">
+              <div className="w-16 h-16 bg-secondary text-on-secondary rounded-2xl flex items-center justify-center mx-auto mb-8 transform group-hover:-rotate-6 transition-transform shrink-0">
                 <span className="material-symbols-outlined text-3xl">event_available</span>
               </div>
-              <h3 className="font-title-md text-title-md font-bold text-on-surface dark:text-inverse-on-surface mb-4">2. Book a Session</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant">
+              <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100 mb-4">2. Book a Session</h3>
+              <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 mt-auto">
                 Schedule a 1-on-1 session that fits perfectly into your demanding schedule.
               </p>
               <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-px bg-outline-variant"></div>
             </div>
             {/* Step 3 */}
-            <div className="p-10 bg-surface-container-low dark:bg-inverse-surface/10 rounded-3xl text-center group border border-outline-variant/10">
-              <div className="w-16 h-16 bg-primary-container text-on-primary-container rounded-2xl flex items-center justify-center mx-auto mb-8 transform group-hover:scale-110 transition-transform">
+            <div className="p-10 bg-surface-container-low dark:bg-slate-800 rounded-3xl text-center group border border-outline-variant/10 h-full flex flex-col">
+              <div className="w-16 h-16 bg-primary-container text-on-primary-container rounded-2xl flex items-center justify-center mx-auto mb-8 transform group-hover:scale-110 transition-transform shrink-0">
                 <span className="material-symbols-outlined text-3xl">school</span>
               </div>
-              <h3 className="font-title-md text-title-md font-bold text-on-surface dark:text-inverse-on-surface mb-4">3. Start Learning</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant">
+              <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100 mb-4">3. Start Learning</h3>
+              <p className="font-body-md text-body-md text-gray-600 dark:text-gray-300 mt-auto">
                 Join the interactive classroom and accelerate your medical understanding.
               </p>
             </div>
@@ -183,10 +183,10 @@ export default function Home() {
       </section>
 
       {/* 4. Why Choose Us Section */}
-      <section className="py-24 px-6 bg-primary dark:bg-primary-container overflow-hidden relative">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-primary dark:bg-primary-container overflow-hidden relative">
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary rounded-full blur-[100px] opacity-20 -mr-48 -mt-48"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-on-primary-fixed-variant rounded-full blur-[100px] opacity-30 -ml-48 -mb-48"></div>
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="lg:w-1/2">
               <h2 className="font-display-lg text-4xl lg:text-5xl font-bold text-on-secondary dark:text-on-primary-container mb-8 leading-tight">
