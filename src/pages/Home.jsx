@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import { mockTutors } from '../data/mockTutors';
+import TutorCard from '../components/TutorCard';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 export default function Home() {
   useDocumentTitle('Home');
   const navigate = useNavigate();
+  const heroContainer = useRef(null);
 
   // We preview only the 6 tutors
   const previewTutors = mockTutors.slice(0, 6);
@@ -14,8 +18,23 @@ export default function Home() {
     navigate(`/tutor/${tutorId}`);
   };
 
+  useGSAP(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    // Initial setups to prevent flashes
+    gsap.set('.hero-badge', { opacity: 0, y: 15 });
+    gsap.set('.hero-title-part', { opacity: 0, y: 35 });
+    gsap.set('.hero-text', { opacity: 0, y: 15 });
+    gsap.set('.hero-cta', { opacity: 0, scale: 0.85 });
+
+    tl.to('.hero-badge', { opacity: 1, y: 0, duration: 0.6 })
+      .to('.hero-title-part', { opacity: 1, y: 0, duration: 0.75, stagger: 0.15 }, '-=0.45')
+      .to('.hero-text', { opacity: 1, y: 0, duration: 0.6 }, '-=0.45')
+      .to('.hero-cta', { opacity: 1, scale: 1, duration: 0.6, stagger: 0.1, ease: 'back.out(1.6)' }, '-=0.35');
+  }, { scope: heroContainer });
+
   return (
-    <div className="flex-grow">
+    <div className="flex-grow" ref={heroContainer}>
       {/* 1. Hero / Banner Section */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-white dark:bg-slate-950">
         <div className="absolute inset-0 z-0">
@@ -27,26 +46,27 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-white/20 dark:from-slate-950 dark:via-slate-950/95 dark:to-transparent"></div>
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <div className="max-w-2xl animate-fade-in-up">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary dark:text-primary-fixed-dim font-label-md text-label-md mb-6 border border-primary/20">
+          <div className="max-w-2xl">
+            <span className="hero-badge inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary dark:text-primary-fixed-dim font-label-md text-label-md mb-6 border border-primary/20">
               Elite Medical Tutoring
             </span>
-            <h1 className="font-display-lg text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              Find Your Perfect <span className="text-primary dark:text-primary-fixed-dim">Medical Tutor</span>
+            <h1 className="font-display-lg text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight overflow-hidden">
+              <span className="hero-title-part inline-block">Find Your Perfect</span>{' '}
+              <span className="hero-title-part inline-block text-primary dark:text-primary-fixed-dim">Medical Tutor</span>
             </h1>
-            <p className="font-body-lg text-lg text-gray-700 dark:text-gray-200 mb-10 leading-relaxed">
+            <p className="hero-text font-body-lg text-lg text-gray-700 dark:text-gray-200 mb-10 leading-relaxed">
               Connect with experienced doctors and medical students for personalized 1-on-1 sessions. Master USMLE, MCAT, and clinical rotations with precision.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 to="/tutors"
-                className="px-10 py-4 bg-primary text-on-secondary rounded-xl font-title-md text-title-md text-center hover:opacity-90 transition-all transform hover:-translate-y-0.5 active:scale-95 shadow-lg"
+                className="hero-cta px-10 py-4 bg-primary text-on-secondary rounded-xl font-title-md text-title-md text-center hover:opacity-90 transition-all transform hover:-translate-y-0.5 active:scale-95 shadow-lg"
               >
                 Find Tutors
               </Link>
               <a
                 href="#how-it-works"
-                className="px-10 py-4 border-2 border-primary text-primary dark:text-primary-fixed-dim dark:border-primary-fixed-dim rounded-xl font-title-md text-title-md text-center hover:bg-primary/5 transition-all active:scale-95"
+                className="hero-cta px-10 py-4 border-2 border-primary text-primary dark:text-primary-fixed-dim dark:border-primary-fixed-dim rounded-xl font-title-md text-title-md text-center hover:bg-primary/5 transition-all active:scale-95"
               >
                 How it Works
               </a>
@@ -77,60 +97,11 @@ export default function Home() {
           {/* Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {previewTutors.map((tutor) => (
-              <div
+              <TutorCard
                 key={tutor.id}
-                className="group bg-white dark:bg-slate-800 rounded-3xl p-6 tutor-card-shadow border border-outline-variant/30 dark:border-slate-700 hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/10 shrink-0 relative bg-primary/5 flex items-center justify-center">
-                    {tutor.image ? (
-                      <img alt={tutor.name} className="w-full h-full object-cover" src={tutor.image} />
-                    ) : (
-                      <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-4xl">person</span>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100">
-                      {tutor.name}
-                    </h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-300 mb-1 font-semibold">
-                      {tutor.institution}
-                    </p>
-                    <div className="flex items-center text-blue-600 dark:text-blue-400">
-                      <span className="material-symbols-outlined text-sm fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                      <span className="font-label-md text-label-md ml-1 font-semibold">{tutor.rating} ({tutor.reviewsCount} reviews)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {tutor.subjects.map((sub, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center justify-center px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 rounded-full text-xs font-semibold"
-                    >
-                      {sub}
-                    </span>
-                  ))}
-                </div>
-
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 line-clamp-2">
-                  {tutor.description}
-                </p>
-
-                <div className="flex items-center justify-between pt-6 border-t border-outline-variant/30 dark:border-slate-700 mt-auto">
-                  <span className="font-title-md text-title-md font-bold text-gray-900 dark:text-gray-100">
-                    ${tutor.price}
-                    <span className="text-gray-500 dark:text-gray-400 text-label-md font-normal">/hr</span>
-                  </span>
-                  <button
-                    onClick={() => handleBookSession(tutor.id)}
-                    className="px-6 py-2.5 bg-primary text-on-secondary dark:bg-primary-container dark:text-on-primary-container rounded-xl font-label-md text-label-md font-semibold hover:opacity-90 transition-all active:scale-95"
-                  >
-                    Book Session
-                  </button>
-                </div>
-              </div>
+                tutor={tutor}
+                onBook={handleBookSession}
+              />
             ))}
           </div>
         </div>
