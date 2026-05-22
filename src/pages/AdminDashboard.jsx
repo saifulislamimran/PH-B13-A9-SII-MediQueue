@@ -360,35 +360,7 @@ export default function AdminDashboard() {
     loadAllData();
   }, []);
 
-  // Student Search & Filter Computations
-  const uniqueTutorsForFilter = useMemo(() => {
-    const list = new Set();
-    students.forEach(s => {
-      if (s.assignedTutor) list.add(s.assignedTutor);
-    });
-    approvedTutors.forEach(t => {
-      if (t.name) list.add(t.name);
-    });
-    return Array.from(list);
-  }, [students, approvedTutors]);
 
-  const filteredStudents = useMemo(() => {
-    return students.filter(student => {
-      const searchLower = studentSearch.toLowerCase();
-      const matchesSearch = student.name.toLowerCase().includes(searchLower) ||
-                            student.email.toLowerCase().includes(searchLower);
-      
-      const matchesTutor = studentTutorFilter === 'all' || student.assignedTutor === studentTutorFilter;
-      const matchesStatus = studentStatusFilter === 'all' || student.taskStatus === studentStatusFilter;
-      
-      let matchesPerformance = true;
-      if (studentPerformanceFilter !== 'all') {
-        matchesPerformance = student.performance.toLowerCase().includes(studentPerformanceFilter.toLowerCase());
-      }
-      
-      return matchesSearch && matchesTutor && matchesStatus && matchesPerformance;
-    });
-  }, [students, studentSearch, studentTutorFilter, studentStatusFilter, studentPerformanceFilter]);
 
   // Compute overall stats dynamically
   const stats = useMemo(() => {
@@ -555,6 +527,36 @@ export default function AdminDashboard() {
   const approvedTutors = useMemo(() => {
     return tutors.filter(t => t.status === 'approved');
   }, [tutors]);
+
+  // Student Search & Filter Computations
+  const uniqueTutorsForFilter = useMemo(() => {
+    const list = new Set();
+    students.forEach(s => {
+      if (s.assignedTutor) list.add(s.assignedTutor);
+    });
+    approvedTutors.forEach(t => {
+      if (t.name) list.add(t.name);
+    });
+    return Array.from(list);
+  }, [students, approvedTutors]);
+
+  const filteredStudents = useMemo(() => {
+    return students.filter(student => {
+      const searchLower = studentSearch.toLowerCase();
+      const matchesSearch = student.name.toLowerCase().includes(searchLower) ||
+                            student.email.toLowerCase().includes(searchLower);
+      
+      const matchesTutor = studentTutorFilter === 'all' || student.assignedTutor === studentTutorFilter;
+      const matchesStatus = studentStatusFilter === 'all' || student.taskStatus === studentStatusFilter;
+      
+      let matchesPerformance = true;
+      if (studentPerformanceFilter !== 'all') {
+        matchesPerformance = student.performance.toLowerCase().includes(studentPerformanceFilter.toLowerCase());
+      }
+      
+      return matchesSearch && matchesTutor && matchesStatus && matchesPerformance;
+    });
+  }, [students, studentSearch, studentTutorFilter, studentStatusFilter, studentPerformanceFilter]);
 
   // Actions: Tutor CRM Manually Add
   const generateTutorTempCredentials = () => {
