@@ -13,6 +13,7 @@ import {
 import { mockTutors } from '../../src/data/mockTutors';
 
 export default function AdminDashboardPage() {
+  const [mounted, setMounted] = useState(false);
   const [tutorsList, setTutorsList] = useState<any[]>([]);
   const [bookingsList, setBookingsList] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,37 +21,55 @@ export default function AdminDashboardPage() {
 
   // Load data from localStorage on mount (safe for Next.js SSR)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
-      const allTutors = [...customTutors, ...mockTutors];
-      setTutorsList(allTutors);
+    setMounted(true);
+    try {
+      if (typeof window !== 'undefined') {
+        const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
+        const allTutors = [...customTutors, ...mockTutors];
+        setTutorsList(allTutors);
 
-      const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-      setBookingsList(bookings);
+        const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+        setBookingsList(bookings);
+      }
+    } catch (err) {
+      console.error("Failed to load admin data from localStorage:", err);
     }
   }, []);
 
   // Compute stats dynamically
   const stats = useMemo(() => {
-    const tutorCount = tutorsList.length;
-    const totalBookings = bookingsList.length;
-    const scheduled = bookingsList.filter(b => b.status === 'Scheduled').length;
-    const rescheduled = bookingsList.filter(b => b.status === 'Rescheduled').length;
+    const tutorCount = tutorsList ? tutorsList.length : 0;
+    const totalBookings = bookingsList ? bookingsList.length : 0;
+    const scheduled = bookingsList ? bookingsList.filter(b => b && b.status === 'Scheduled').length : 0;
+    const rescheduled = bookingsList ? bookingsList.filter(b => b && b.status === 'Rescheduled').length : 0;
     
-    const sumPrice = tutorsList.reduce((acc, curr) => acc + curr.price, 0);
+    const sumPrice = tutorsList
+      ? tutorsList.reduce((acc, curr) => {
+          const priceVal = curr && curr.price ? Number(curr.price) : 0;
+          return acc + (isNaN(priceVal) ? 0 : priceVal);
+        }, 0)
+      : 0;
     const avgPrice = tutorCount > 0 ? (sumPrice / tutorCount).toFixed(1) : '0';
 
     // Specialty Subject distribution
     const subjectDistribution: { [key: string]: number } = {};
-    tutorsList.forEach(t => {
-      if (t.subjects && Array.isArray(t.subjects)) {
-        t.subjects.forEach((sub: string) => {
-          subjectDistribution[sub] = (subjectDistribution[sub] || 0) + 1;
-        });
-      }
-    });
+    if (tutorsList) {
+      tutorsList.forEach(t => {
+        if (t && t.subjects && Array.isArray(t.subjects)) {
+          t.subjects.forEach((sub: string) => {
+            if (sub) {
+              subjectDistribution[sub] = (subjectDistribution[sub] || 0) + 1;
+            }
+          });
+        }
+      });
+    }
 
-    const uniqueInstitutions = new Set(tutorsList.map(t => t.institution));
+    const uniqueInstitutions = new Set(
+      tutorsList 
+        ? tutorsList.map(t => t && t.institution ? t.institution : '').filter(Boolean) 
+        : []
+    );
 
     return {
       tutorCount,
@@ -66,25 +85,33 @@ export default function AdminDashboardPage() {
   // Handler to delete a tutor (only from local storage)
   const handleDeleteTutor = (tutorId: string | number) => {
     if (confirm('Are you sure you want to remove this tutor listing?')) {
-      const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
-      const updatedCustom = customTutors.filter((t: any) => t.id !== tutorId);
-      localStorage.setItem('customTutors', JSON.stringify(updatedCustom));
-      
-      // Update local state
-      setTutorsList([...updatedCustom, ...mockTutors]);
+      try {
+        const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
+        const updatedCustom = customTutors.filter((t: any) => t && t.id !== tutorId);
+        localStorage.setItem('customTutors', JSON.stringify(updatedCustom));
+        
+        // Update local state
+        setTutorsList([...updatedCustom, ...mockTutors]);
+      } catch (err) {
+        console.error("Failed to delete tutor:", err);
+      }
     }
   };
 
   // Filtered tutors list
   const filteredTutors = useMemo(() => {
+    if (!tutorsList) return [];
     return tutorsList.filter(tutor => {
+      if (!tutor) return false;
+      const name = tutor.name || '';
+      const institution = tutor.institution || '';
       const matchesSearch = 
-        tutor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tutor.institution.toLowerCase().includes(searchQuery.toLowerCase());
+        name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        institution.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesSubject = 
         subjectFilter === 'All' || 
-        (tutor.subjects && tutor.subjects.includes(subjectFilter));
+        (tutor.subjects && Array.isArray(tutor.subjects) && tutor.subjects.includes(subjectFilter));
 
       return matchesSearch && matchesSubject;
     });
@@ -93,13 +120,28 @@ export default function AdminDashboardPage() {
   // Get unique subject list for filters
   const allSubjects = useMemo(() => {
     const subjectsSet = new Set<string>();
-    tutorsList.forEach(t => {
-      if (t.subjects) {
-        t.subjects.forEach((s: string) => subjectsSet.add(s));
-      }
-    });
+    if (tutorsList) {
+      tutorsList.forEach(t => {
+        if (t && t.subjects && Array.isArray(t.subjects)) {
+          t.subjects.forEach((s: string) => {
+            if (s) subjectsSet.add(s);
+          });
+        }
+      });
+    }
     return Array.from(subjectsSet);
   }, [tutorsList]);
+
+  if (!mounted) {
+    return (
+      <div className="py-8 px-6 max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Loading Dashboard Metrics...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-8 px-6 max-w-7xl mx-auto space-y-8">
@@ -213,16 +255,16 @@ export default function AdminDashboardPage() {
               <tbody className="divide-y divide-gray-100 dark:divide-slate-750">
                 {filteredTutors.length > 0 ? (
                   filteredTutors.map((tutor) => (
-                    <tr key={tutor.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-750/30">
+                    <tr key={tutor.id || Math.random().toString()} className="hover:bg-gray-50/50 dark:hover:bg-slate-750/30">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <img 
-                            src={tutor.image} 
-                            alt={tutor.name} 
+                            src={tutor.image || 'https://via.placeholder.com/150'} 
+                            alt={tutor.name || 'Tutor'} 
                             className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-650"
                           />
                           <div>
-                            <p className="font-bold text-gray-900 dark:text-white">{tutor.name}</p>
+                            <p className="font-bold text-gray-900 dark:text-white">{tutor.name || 'Anonymous Tutor'}</p>
                             <div className="flex gap-1 mt-1 flex-wrap">
                               {tutor.subjects?.slice(0, 2).map((s: string) => (
                                 <span key={s} className="px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-md text-[9px] font-bold">
@@ -234,10 +276,10 @@ export default function AdminDashboardPage() {
                         </div>
                       </td>
                       <td className="p-4 align-middle text-gray-600 dark:text-gray-300 font-medium">
-                        {tutor.institution}
+                        {tutor.institution || 'Independent'}
                       </td>
                       <td className="p-4 align-middle font-bold text-gray-900 dark:text-white">
-                        ${tutor.price}/hr
+                        ${tutor.price || 0}/hr
                       </td>
                       <td className="p-4 align-middle text-center">
                         <button

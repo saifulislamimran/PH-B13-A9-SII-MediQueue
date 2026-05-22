@@ -18,32 +18,48 @@ export function AuthProvider({ children }) {
 
   // Sign Up / Register
   const registerUser = (email, password) => {
+    if (!auth) {
+      return Promise.reject(new Error("Authentication is not initialized. Please check that a valid Firebase API Key is provided in environment variables."));
+    }
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
   // Sign In / Login
   const loginUser = (email, password) => {
+    if (!auth) {
+      return Promise.reject(new Error("Authentication is not initialized. Please check that a valid Firebase API Key is provided in environment variables."));
+    }
     setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
   // Google Login
   const loginWithGoogle = () => {
+    if (!auth || !googleProvider) {
+      return Promise.reject(new Error("Google Authentication is not configured or initialized. Please check your Firebase settings."));
+    }
     setLoading(true);
     return signInWithPopup(auth, googleProvider);
   };
 
   // Logout
   const logoutUser = () => {
-    setLoading(true);
     removeStoredToken();
+    if (!auth) {
+      setUser(null);
+      setLoading(false);
+      return Promise.resolve();
+    }
+    setLoading(true);
     return signOut(auth);
   };
 
   // Update Profile
   const updateUserProfile = (name, photoURL) => {
-    if (!auth.currentUser) return Promise.reject(new Error("No user is logged in."));
+    if (!auth || !auth.currentUser) {
+      return Promise.reject(new Error("No active user session found, or authentication is not initialized."));
+    }
     return updateProfile(auth.currentUser, {
       displayName: name,
       photoURL: photoURL
@@ -55,6 +71,11 @@ export function AuthProvider({ children }) {
 
   // Auth observer
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       
