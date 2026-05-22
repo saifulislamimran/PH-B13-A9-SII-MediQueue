@@ -74,6 +74,12 @@ export default function AdminDashboard() {
   const [performance, setPerformance] = useState('Good (85%)');
   const [taskStatus, setTaskStatus] = useState('In Progress');
 
+  // Student Search and Filter States
+  const [studentSearch, setStudentSearch] = useState('');
+  const [studentTutorFilter, setStudentTutorFilter] = useState('all');
+  const [studentStatusFilter, setStudentStatusFilter] = useState('all');
+  const [studentPerformanceFilter, setStudentPerformanceFilter] = useState('all');
+
   // Transaction Form Fields
   const [txType, setTxType] = useState('inflow');
   const [txDesc, setTxDesc] = useState('');
@@ -353,6 +359,36 @@ export default function AdminDashboard() {
   useEffect(() => {
     loadAllData();
   }, []);
+
+  // Student Search & Filter Computations
+  const uniqueTutorsForFilter = useMemo(() => {
+    const list = new Set();
+    students.forEach(s => {
+      if (s.assignedTutor) list.add(s.assignedTutor);
+    });
+    approvedTutors.forEach(t => {
+      if (t.name) list.add(t.name);
+    });
+    return Array.from(list);
+  }, [students, approvedTutors]);
+
+  const filteredStudents = useMemo(() => {
+    return students.filter(student => {
+      const searchLower = studentSearch.toLowerCase();
+      const matchesSearch = student.name.toLowerCase().includes(searchLower) ||
+                            student.email.toLowerCase().includes(searchLower);
+      
+      const matchesTutor = studentTutorFilter === 'all' || student.assignedTutor === studentTutorFilter;
+      const matchesStatus = studentStatusFilter === 'all' || student.taskStatus === studentStatusFilter;
+      
+      let matchesPerformance = true;
+      if (studentPerformanceFilter !== 'all') {
+        matchesPerformance = student.performance.toLowerCase().includes(studentPerformanceFilter.toLowerCase());
+      }
+      
+      return matchesSearch && matchesTutor && matchesStatus && matchesPerformance;
+    });
+  }, [students, studentSearch, studentTutorFilter, studentStatusFilter, studentPerformanceFilter]);
 
   // Compute overall stats dynamically
   const stats = useMemo(() => {
@@ -1444,6 +1480,103 @@ export default function AdminDashboard() {
                 Add Student Manually
               </button>
             </div>
+            {/* Search & Filter Panel */}
+            <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-5 shadow-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                
+                {/* Search Input */}
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-450 text-[18px]">search</span>
+                  <input
+                    type="text"
+                    placeholder="Search name or email..."
+                    value={studentSearch}
+                    onChange={(e) => setStudentSearch(e.target.value)}
+                    className="w-full pl-9 pr-8 py-2.5 bg-gray-50 dark:bg-slate-900 border border-outline-variant/35 dark:border-slate-700 rounded-2xl text-xs font-bold text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/25"
+                  />
+                  {studentSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setStudentSearch('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-650 dark:hover:text-gray-200"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">close</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Tutor Filter */}
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-450 text-[18px]">person</span>
+                  <select
+                    value={studentTutorFilter}
+                    onChange={(e) => setStudentTutorFilter(e.target.value)}
+                    className="w-full pl-9 pr-8 py-2.5 bg-gray-50 dark:bg-slate-900 border border-outline-variant/35 dark:border-slate-700 rounded-2xl text-xs font-bold text-gray-800 dark:text-gray-205 outline-none focus:ring-2 focus:ring-primary/25 appearance-none"
+                  >
+                    <option value="all">All Tutors</option>
+                    {uniqueTutorsForFilter.map(name => (
+                      <option key={name} value={name}>{name}</option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-450 text-[18px] pointer-events-none">arrow_drop_down</span>
+                </div>
+
+                {/* Task Status Filter */}
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-450 text-[18px]">assignment_turned_in</span>
+                  <select
+                    value={studentStatusFilter}
+                    onChange={(e) => setStudentStatusFilter(e.target.value)}
+                    className="w-full pl-9 pr-8 py-2.5 bg-gray-50 dark:bg-slate-900 border border-outline-variant/35 dark:border-slate-700 rounded-2xl text-xs font-bold text-gray-800 dark:text-gray-205 outline-none focus:ring-2 focus:ring-primary/25 appearance-none"
+                  >
+                    <option value="all">All Task States</option>
+                    <option value="Completed">Completed</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Overdue">Overdue</option>
+                  </select>
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-450 text-[18px] pointer-events-none">arrow_drop_down</span>
+                </div>
+
+                {/* Performance Filter */}
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-455 text-[18px]">trending_up</span>
+                  <select
+                    value={studentPerformanceFilter}
+                    onChange={(e) => setStudentPerformanceFilter(e.target.value)}
+                    className="w-full pl-9 pr-8 py-2.5 bg-gray-50 dark:bg-slate-900 border border-outline-variant/35 dark:border-slate-700 rounded-2xl text-xs font-bold text-gray-800 dark:text-gray-205 outline-none focus:ring-2 focus:ring-primary/25 appearance-none"
+                  >
+                    <option value="all">All Performances</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Good">Good</option>
+                    <option value="Needs Review">Needs Review</option>
+                  </select>
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-450 text-[18px] pointer-events-none">arrow_drop_down</span>
+                </div>
+
+              </div>
+
+              {/* Status Info Bar */}
+              <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold text-gray-500 dark:text-gray-400">
+                <div>
+                  Showing <span className="text-primary dark:text-primary-fixed-dim">{filteredStudents.length}</span> of {students.length} students
+                </div>
+                {(studentSearch || studentTutorFilter !== 'all' || studentStatusFilter !== 'all' || studentPerformanceFilter !== 'all') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStudentSearch('');
+                      setStudentTutorFilter('all');
+                      setStudentStatusFilter('all');
+                      setStudentPerformanceFilter('all');
+                    }}
+                    className="text-primary dark:text-primary-fixed-dim hover:underline flex items-center gap-1.5 transition-all"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">filter_alt_off</span>
+                    Reset Active Filters
+                  </button>
+                )}
+              </div>
+            </div>
 
             {/* Students Table */}
             <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm">
@@ -1460,8 +1593,8 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
-                    {students.length > 0 ? (
-                      students.map(student => (
+                    {filteredStudents.length > 0 ? (
+                      filteredStudents.map(student => (
                         <tr key={student.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                           <td className="px-6 py-4">
                             <p className="font-bold text-gray-900 dark:text-white text-sm">{student.name}</p>
