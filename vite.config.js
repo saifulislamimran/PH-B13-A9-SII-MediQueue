@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
+  build: {
+    chunkSizeWarningLimit: 1600, // লিমিট বাড়িয়ে 1600 kb (1.6 MB) করে দেওয়া হলো
+  }
 })
