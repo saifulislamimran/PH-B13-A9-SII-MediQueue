@@ -104,6 +104,16 @@ export default function Home() {
               />
             ))}
           </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to="/tutors"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-on-secondary rounded-xl font-title-md text-title-md hover:opacity-90 transition-all transform hover:-translate-y-0.5 active:scale-95 shadow-md"
+            >
+              See More Tutors
+              <span className="material-symbols-outlined">arrow_forward</span>
+            </Link>
+          </div>
         </div>
       </section>
 

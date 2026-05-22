@@ -143,7 +143,7 @@ export function AuthProvider({ children }) {
   };
 
   // Update Profile
-  const updateUserProfile = (name, photoURL, role) => {
+  const updateUserProfile = (name, photoURL, role, extra = {}) => {
     if (isMockAuth) {
       const stored = localStorage.getItem("mock_user");
       const activeUser = user || (stored ? JSON.parse(stored) : null);
@@ -156,9 +156,7 @@ export function AuthProvider({ children }) {
       if (role) {
         updatedUser.role = role;
       }
-      setUser(updatedUser);
-      localStorage.setItem("mock_user", JSON.stringify(updatedUser));
-      
+
       // Update in db as well
       const db = getMockUsersDB();
       const userIndex = db.findIndex(u => u.uid === activeUser.uid);
@@ -171,6 +169,21 @@ export function AuthProvider({ children }) {
         };
         saveMockUsersDB(db);
       }
+
+      const profileKey = `profile_${activeUser.uid || activeUser.email}`;
+      const savedProfile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+      const newProfile = {
+        ...savedProfile,
+        age: extra.age !== undefined ? extra.age : (savedProfile.age || ''),
+        designation: extra.designation !== undefined ? extra.designation : (savedProfile.designation || ''),
+        institution: extra.institution !== undefined ? extra.institution : (savedProfile.institution || ''),
+        subscriptionStatus: extra.subscriptionStatus !== undefined ? extra.subscriptionStatus : (savedProfile.subscriptionStatus || 'free'),
+        studentTutorId: savedProfile.studentTutorId || `MQ-${activeUser.uid ? activeUser.uid.substring(0, 6).toUpperCase() : 'TEST'}`
+      };
+      localStorage.setItem(profileKey, JSON.stringify(newProfile));
+      localStorage.setItem("mock_user", JSON.stringify({ ...updatedUser, ...newProfile }));
+
+      setUser({ ...updatedUser, ...newProfile });
       return Promise.resolve();
     }
     if (!auth || !auth.currentUser) {
@@ -185,14 +198,79 @@ export function AuthProvider({ children }) {
         localStorage.setItem(`role_${uid}`, role);
       }
       const savedRole = localStorage.getItem(`role_${uid}`) || 'student';
-      // Force state update to reflect new profile details
+
+      const profileKey = `profile_${uid}`;
+      const savedProfile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+      const newProfile = {
+        ...savedProfile,
+        age: extra.age !== undefined ? extra.age : (savedProfile.age || ''),
+        designation: extra.designation !== undefined ? extra.designation : (savedProfile.designation || ''),
+        institution: extra.institution !== undefined ? extra.institution : (savedProfile.institution || ''),
+        subscriptionStatus: extra.subscriptionStatus !== undefined ? extra.subscriptionStatus : (savedProfile.subscriptionStatus || 'free'),
+        studentTutorId: savedProfile.studentTutorId || `MQ-${uid.substring(0, 6).toUpperCase()}`
+      };
+      localStorage.setItem(profileKey, JSON.stringify(newProfile));
+
       setUser({ 
         ...auth.currentUser, 
         displayName: name, 
         photoURL: photoURL,
-        role: savedRole
+        role: savedRole,
+        ...newProfile
       });
     });
+  };
+
+  // Synchronize/refresh user state from localStorage
+  const refreshUser = () => {
+    if (isMockAuth) {
+      const savedMockUser = localStorage.getItem("mock_user");
+      if (savedMockUser) {
+        const parsed = JSON.parse(savedMockUser);
+        const db = getMockUsersDB();
+        const latestUser = db.find(u => u.uid === parsed.uid) || parsed;
+        
+        const profileKey = `profile_${latestUser.uid || latestUser.email}`;
+        const savedProfile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+        
+        const merged = {
+          ...latestUser,
+          age: savedProfile.age || '',
+          designation: savedProfile.designation || '',
+          institution: savedProfile.institution || '',
+          studentTutorId: savedProfile.studentTutorId || `MQ-${latestUser.uid ? latestUser.uid.substring(0, 6).toUpperCase() : 'TEST'}`,
+          subscriptionStatus: savedProfile.subscriptionStatus || 'free'
+        };
+        setUser(merged);
+        localStorage.setItem("mock_user", JSON.stringify(merged));
+      } else {
+        setUser(null);
+      }
+    } else {
+      if (auth.currentUser) {
+        const uid = auth.currentUser.uid;
+        const savedRole = localStorage.getItem(`role_${uid}`) || 'student';
+        
+        const profileKey = `profile_${uid}`;
+        const savedProfile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+        
+        setUser({
+          ...auth.currentUser,
+          role: savedRole,
+          displayName: auth.currentUser.displayName,
+          photoURL: auth.currentUser.photoURL,
+          email: auth.currentUser.email,
+          uid: auth.currentUser.uid,
+          age: savedProfile.age || '',
+          designation: savedProfile.designation || '',
+          institution: savedProfile.institution || '',
+          studentTutorId: savedProfile.studentTutorId || `MQ-${uid.substring(0, 6).toUpperCase()}`,
+          subscriptionStatus: savedProfile.subscriptionStatus || 'free'
+        });
+      } else {
+        setUser(null);
+      }
+    }
   };
 
   // Auth observer
@@ -218,7 +296,23 @@ export function AuthProvider({ children }) {
 
       const savedMockUser = localStorage.getItem("mock_user");
       if (savedMockUser) {
-        setUser(JSON.parse(savedMockUser));
+        const parsed = JSON.parse(savedMockUser);
+        const db = getMockUsersDB();
+        const latestUser = db.find(u => u.uid === parsed.uid) || parsed;
+        
+        const profileKey = `profile_${latestUser.uid || latestUser.email}`;
+        const savedProfile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+        
+        const merged = {
+          ...latestUser,
+          age: savedProfile.age || '',
+          designation: savedProfile.designation || '',
+          institution: savedProfile.institution || '',
+          studentTutorId: savedProfile.studentTutorId || `MQ-${latestUser.uid ? latestUser.uid.substring(0, 6).toUpperCase() : 'TEST'}`,
+          subscriptionStatus: savedProfile.subscriptionStatus || 'free'
+        };
+        setUser(merged);
+        localStorage.setItem("mock_user", JSON.stringify(merged));
         setStoredToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mockToken");
       } else {
         setUser(null);
@@ -231,9 +325,17 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const savedRole = localStorage.getItem(`role_${currentUser.uid}`) || 'student';
+        const profileKey = `profile_${currentUser.uid}`;
+        const savedProfile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+        
         setUser({
           ...currentUser,
-          role: savedRole
+          role: savedRole,
+          age: savedProfile.age || '',
+          designation: savedProfile.designation || '',
+          institution: savedProfile.institution || '',
+          studentTutorId: savedProfile.studentTutorId || `MQ-${currentUser.uid.substring(0, 6).toUpperCase()}`,
+          subscriptionStatus: savedProfile.subscriptionStatus || 'free'
         });
         try {
           const idToken = await currentUser.getIdToken();
@@ -259,7 +361,8 @@ export function AuthProvider({ children }) {
     loginUser,
     loginWithGoogle,
     logoutUser,
-    updateUserProfile
+    updateUserProfile,
+    refreshUser
   };
 
   return (

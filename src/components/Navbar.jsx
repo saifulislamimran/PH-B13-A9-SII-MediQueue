@@ -11,12 +11,8 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Dropdown & Modal States
+  // Dropdown States
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-  const [editName, setEditName] = useState('');
-  const [editPhotoURL, setEditPhotoURL] = useState('');
-  const [editRole, setEditRole] = useState('student');
 
   // Scroll event listener to shrink Navbar height
   useEffect(() => {
@@ -50,22 +46,6 @@ export default function Navbar() {
     } catch (err) {
       console.error(err);
       toast.error('Failed to log out.');
-    }
-  };
-
-  const handleUpdateProfile = async (e) => {
-    e.preventDefault();
-    if (!editName.trim()) {
-      toast.error('Name is required.');
-      return;
-    }
-    try {
-      await updateUserProfile(editName, editPhotoURL, editRole);
-      toast.success('Profile updated successfully!');
-      setIsEditProfileOpen(false);
-    } catch (err) {
-      console.error(err);
-      toast.error(err.message || 'Failed to update profile.');
     }
   };
 
@@ -237,10 +217,7 @@ export default function Navbar() {
                       <button
                         onClick={() => {
                           setIsProfileDropdownOpen(false);
-                          setEditName(user.displayName || '');
-                          setEditPhotoURL(user.photoURL || '');
-                          setEditRole(user.role || 'student');
-                          setIsEditProfileOpen(true);
+                          navigate('/my-bookings?tab=profile');
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left font-label-md text-label-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                       >
@@ -371,10 +348,7 @@ export default function Navbar() {
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      setEditName(user.displayName || '');
-                      setEditPhotoURL(user.photoURL || '');
-                      setEditRole(user.role || 'student');
-                      setIsEditProfileOpen(true);
+                      navigate('/my-bookings?tab=profile');
                     }}
                     className="p-1.5 text-primary hover:bg-primary/10 rounded-full transition-colors flex items-center justify-center border border-primary/20"
                   >
@@ -412,111 +386,6 @@ export default function Navbar() {
               </Link>
             </div>
           )}
-        </div>
-      )}
-
-      {/* Edit Profile Modal */}
-      {isEditProfileOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="w-full max-w-[440px] bg-white dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">manage_accounts</span>
-                Edit Profile
-              </h2>
-              <button
-                onClick={() => setIsEditProfileOpen(false)}
-                className="p-1.5 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-              >
-                <span className="material-symbols-outlined text-gray-500">close</span>
-              </button>
-            </div>
-
-            <form onSubmit={handleUpdateProfile} className="space-y-4">
-              {/* Full Name */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block" htmlFor="edit-name">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg dark:text-gray-400">
-                    person
-                  </span>
-                  <input
-                    id="edit-name"
-                    type="text"
-                    required
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm text-gray-950 dark:text-white placeholder:text-gray-400"
-                    placeholder="Enter your name"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Photo URL */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block" htmlFor="edit-photo">
-                  Photo URL
-                </label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg dark:text-gray-400">
-                    image
-                  </span>
-                  <input
-                    id="edit-photo"
-                    type="url"
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm text-gray-950 dark:text-white placeholder:text-gray-400"
-                    placeholder="https://example.com/photo.jpg"
-                    value={editPhotoURL}
-                    onChange={(e) => setEditPhotoURL(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Role Selection */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block" htmlFor="edit-role">
-                  Account Type / Role
-                </label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg dark:text-gray-400">
-                    badge
-                  </span>
-                  <select
-                    id="edit-role"
-                    className="w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm text-gray-950 dark:text-white appearance-none cursor-pointer"
-                    value={editRole}
-                    onChange={(e) => setEditRole(e.target.value)}
-                  >
-                    <option value="student">Student (General User)</option>
-                    <option value="tutor">Tutor (Instructor)</option>
-                    <option value="admin">Administrator</option>
-                  </select>
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none dark:text-gray-400">
-                    arrow_drop_down
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 justify-end pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsEditProfileOpen(false)}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-bold rounded-xl transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 bg-primary text-on-secondary hover:opacity-95 text-xs font-bold rounded-xl shadow-sm transition-all active:scale-[0.98]"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </form>
-          </div>
         </div>
       )}
     </header>

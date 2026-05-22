@@ -7,16 +7,31 @@ export default function AdminDashboard() {
   useDocumentTitle('System CRM Dashboard');
 
   // Navigation state
-  const [activeTab, setActiveTab] = useState('analytics'); // 'analytics', 'students', 'tutors', 'financials'
+  const [activeTab, setActiveTab] = useState('analytics'); // 'analytics', 'students', 'tutors', 'financials', 'approvals'
 
   // CRM Data States
   const [students, setStudents] = useState([]);
   const [tutors, setTutors] = useState([]);
   const [ledger, setLedger] = useState([]);
+  const [changeRequests, setChangeRequests] = useState([]);
+  const [tutorApplications, setTutorApplications] = useState([]);
 
   // Form Modals states
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
+
+  // Review Modals states
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [approvedFields, setApprovedFields] = useState({
+    displayName: true,
+    email: true,
+    role: true,
+    studentTutorId: true
+  });
+
+  const [isTutorAppModalOpen, setIsTutorAppModalOpen] = useState(false);
+  const [selectedTutorApp, setSelectedTutorApp] = useState(null);
 
   // Student Form Fields
   const [studentName, setStudentName] = useState('');
@@ -126,6 +141,59 @@ export default function AdminDashboard() {
     
     localStorage.setItem('admin_tutors_crm', JSON.stringify(crmMeta));
     setTutors(mergedTutors);
+
+    // 4. Change Requests
+    let savedRequests = localStorage.getItem('profile_change_requests');
+    if (!savedRequests) {
+      const defaultRequests = [
+        {
+          id: 'req-default-1',
+          userId: 'mock-uid-default-student',
+          userEmail: 'lucas.m@medical.edu',
+          userName: 'Lucas Miller',
+          oldValues: {
+            displayName: 'Lucas Miller',
+            email: 'lucas.m@medical.edu',
+            role: 'student',
+            studentTutorId: 'MQ-LUCASM'
+          },
+          requestedChanges: {
+            displayName: 'Dr. Lucas Miller',
+            email: 'lucas.miller@mayo.edu',
+            role: 'student',
+            studentTutorId: 'MQ-LUCASDR'
+          },
+          status: 'pending',
+          requestedAt: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('profile_change_requests', JSON.stringify(defaultRequests));
+      savedRequests = JSON.stringify(defaultRequests);
+    }
+    setChangeRequests(JSON.parse(savedRequests));
+
+    // 5. Tutor Applications
+    let savedApps = localStorage.getItem('tutor_applications');
+    if (!savedApps) {
+      const defaultApps = [
+        {
+          id: 'app-default-1',
+          userId: 'mock-uid-default-student',
+          userName: 'Lucas Miller',
+          userEmail: 'lucas.m@medical.edu',
+          subjects: ['Cardiology'],
+          institution: 'Mayo Clinic Alix School of Medicine',
+          price: 70,
+          bio: 'MD candidate with 2 years of tutoring experience in medical physiology and cardiac anatomy. EKG certified.',
+          credentialsUrl: 'https://example.com/lucas-medical-degree.pdf',
+          status: 'pending',
+          appliedAt: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('tutor_applications', JSON.stringify(defaultApps));
+      savedApps = JSON.stringify(defaultApps);
+    }
+    setTutorApplications(JSON.parse(savedApps));
   };
 
   useEffect(() => {
@@ -135,7 +203,6 @@ export default function AdminDashboard() {
   // Compute overall stats dynamically
   const stats = useMemo(() => {
     const totalTutors = tutors.length;
-    const pendingTutorsCount = tutors.filter(t => t.status === 'pending').length;
     const totalStudents = students.length;
     
     // Bookings count from bookings DB
@@ -155,17 +222,23 @@ export default function AdminDashboard() {
       });
     });
 
+    const pendingAppsCount = tutorApplications.filter(a => a.status === 'pending').length;
+    const pendingRequestsCount = changeRequests.filter(r => r.status === 'pending').length;
+    const totalPendingApprovals = pendingAppsCount + pendingRequestsCount;
+
     return {
       totalTutors,
-      pendingTutorsCount,
       totalStudents,
       totalBookings,
       inflowTotal,
       outflowTotal,
       netProfit,
-      subjectDistribution
+      subjectDistribution,
+      pendingAppsCount,
+      pendingRequestsCount,
+      totalPendingApprovals
     };
-  }, [tutors, students, ledger]);
+  }, [tutors, students, ledger, tutorApplications, changeRequests]);
 
   // Approved tutors list for selectors
   const approvedTutors = useMemo(() => {
@@ -288,6 +361,250 @@ export default function AdminDashboard() {
     toast.success('Transaction recorded in ledger.');
   };
 
+  // Actions: Profile Change Request Approval
+  const openRequestReview = (req) => {
+    setSelectedRequest(req);
+    setApprovedFields({
+      displayName: req.oldValues.displayName !== req.requestedChanges.displayName,
+      email: req.oldValues.email !== req.requestedChanges.email,
+      role: req.oldValues.role !== req.requestedChanges.role,
+      studentTutorId: req.oldValues.studentTutorId !== req.requestedChanges.studentTutorId
+    });
+    setIsRequestModalOpen(true);
+  };
+
+  const handleApproveChangeRequestSubmit = (e) => {
+    e.preventDefault();
+    if (!selectedRequest) return;
+
+    try {
+      const { userId, userEmail, requestedChanges } = selectedRequest;
+      const approvedKeys = Object.keys(approvedFields).filter(key => approvedFields[key]);
+
+      if (approvedKeys.length === 0) {
+        toast.error("Please select at least one field to approve, or deny the request instead.");
+        return;
+      }
+
+      // 1. Update mock_users_db
+      const db = JSON.parse(localStorage.getItem("mock_users_db") || "[]");
+      const userIndex = db.findIndex(u => u.uid === userId || u.email.toLowerCase() === userEmail.toLowerCase());
+      if (userIndex !== -1) {
+        if (approvedFields.displayName) db[userIndex].displayName = requestedChanges.displayName;
+        if (approvedFields.email) db[userIndex].email = requestedChanges.email;
+        if (approvedFields.role) db[userIndex].role = requestedChanges.role;
+        localStorage.setItem("mock_users_db", JSON.stringify(db));
+      }
+
+      // 2. Update role_${userId} and role_${userEmail}
+      if (approvedFields.role) {
+        localStorage.setItem(`role_${userId}`, requestedChanges.role);
+        localStorage.setItem(`role_${userEmail}`, requestedChanges.role);
+      }
+
+      // 3. Update profile_${userId} and profile_${userEmail}
+      const profileKey = `profile_${userId}`;
+      const profileKeyEmail = `profile_${userEmail}`;
+      const oldProfile = JSON.parse(localStorage.getItem(profileKey) || localStorage.getItem(profileKeyEmail) || "{}");
+      const newProfile = {
+        ...oldProfile,
+        ...(approvedFields.studentTutorId ? { studentTutorId: requestedChanges.studentTutorId } : {})
+      };
+      localStorage.setItem(profileKey, JSON.stringify(newProfile));
+      localStorage.setItem(profileKeyEmail, JSON.stringify(newProfile));
+
+      // 4. Update mock_user if active user
+      const activeUser = JSON.parse(localStorage.getItem("mock_user") || "null");
+      if (activeUser && (activeUser.uid === userId || activeUser.email.toLowerCase() === userEmail.toLowerCase())) {
+        const updatedActive = {
+          ...activeUser,
+          ...(approvedFields.displayName ? { displayName: requestedChanges.displayName } : {}),
+          ...(approvedFields.email ? { email: requestedChanges.email } : {}),
+          ...(approvedFields.role ? { role: requestedChanges.role } : {}),
+          ...newProfile
+        };
+        localStorage.setItem("mock_user", JSON.stringify(updatedActive));
+      }
+
+      // 5. Update request status
+      const requests = JSON.parse(localStorage.getItem('profile_change_requests') || '[]');
+      const updatedRequests = requests.map(r => {
+        if (r.id === selectedRequest.id) {
+          return { ...r, status: 'approved', approvedFields: approvedKeys };
+        }
+        return r;
+      });
+      localStorage.setItem('profile_change_requests', JSON.stringify(updatedRequests));
+
+      toast.success(`Change request approved for: ${approvedKeys.join(', ')}`);
+      setIsRequestModalOpen(false);
+      setSelectedRequest(null);
+      loadAllData();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to approve change request.");
+    }
+  };
+
+  const handleDenyChangeRequest = (requestId) => {
+    try {
+      const requests = JSON.parse(localStorage.getItem('profile_change_requests') || '[]');
+      const updatedRequests = requests.map(r => {
+        if (r.id === requestId) {
+          return { ...r, status: 'denied' };
+        }
+        return r;
+      });
+      localStorage.setItem('profile_change_requests', JSON.stringify(updatedRequests));
+
+      toast.success("Profile change request has been denied.");
+      setIsRequestModalOpen(false);
+      setSelectedRequest(null);
+      loadAllData();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to deny change request.");
+    }
+  };
+
+  // Actions: Tutor Application Review
+  const openTutorAppReview = (app) => {
+    setSelectedTutorApp(app);
+    setIsTutorAppModalOpen(true);
+  };
+
+  const handleApproveTutorApplication = (app) => {
+    try {
+      const { userId, userEmail, userName, subjects, institution, price, bio } = app;
+
+      // 1. Update mock_users_db
+      const db = JSON.parse(localStorage.getItem("mock_users_db") || "[]");
+      const userIndex = db.findIndex(u => u.uid === userId || u.email.toLowerCase() === userEmail.toLowerCase());
+      if (userIndex !== -1) {
+        db[userIndex].role = 'tutor';
+        localStorage.setItem("mock_users_db", JSON.stringify(db));
+      }
+
+      // 2. Update role flags
+      localStorage.setItem(`role_${userId}`, 'tutor');
+      localStorage.setItem(`role_${userEmail}`, 'tutor');
+
+      // 3. Update profile details
+      const profileKey = `profile_${userId}`;
+      const profileKeyEmail = `profile_${userEmail}`;
+      const oldProfile = JSON.parse(localStorage.getItem(profileKey) || localStorage.getItem(profileKeyEmail) || "{}");
+      const newProfile = {
+        ...oldProfile,
+        role: 'tutor'
+      };
+      localStorage.setItem(profileKey, JSON.stringify(newProfile));
+      localStorage.setItem(profileKeyEmail, JSON.stringify(newProfile));
+
+      // 4. Update mock_user if active user
+      const activeUser = JSON.parse(localStorage.getItem("mock_user") || "null");
+      if (activeUser && (activeUser.uid === userId || activeUser.email.toLowerCase() === userEmail.toLowerCase())) {
+        const updatedActive = {
+          ...activeUser,
+          role: 'tutor',
+          ...newProfile
+        };
+        localStorage.setItem("mock_user", JSON.stringify(updatedActive));
+      }
+
+      // 5. Add to customTutors
+      const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
+      const existingTutorIndex = customTutors.findIndex(t => t.email === userEmail);
+      
+      const targetPhoto = activeUser && activeUser.email.toLowerCase() === userEmail.toLowerCase() ? activeUser.photoURL : 
+        (userIndex !== -1 ? db[userIndex].photoURL : "https://lh3.googleusercontent.com/aida-public/AB6AXuCYGCzxWEJXxLkhf1ZYrj5iCh84lmUnuFIDoSiXPS9tqi0XSMFy4oxYx1xn2Xop9PmlOVqx4jt1JhIvBG3DiLzxIDtLLTADZTwB52L5pf5c316c1oOwwf8-LkKBCy_34v7Y7tYh1iOIE2XRVRcHmPQjOQcUe11o9LgOG_mqHWECPS3OaU6VUtzx2-COQ0AScUHCWmKa4gA4op6XAFa8Djiid3j6uw3jGOhed6HAhV8JyCKEidkTKoR7rw8DnYf844tpEPK98Sm2lQk");
+
+      const tutorListing = {
+        id: `tutor-custom-${userId || Math.random().toString(36).substr(2, 9)}`,
+        name: userName,
+        email: userEmail,
+        subjects: subjects || [],
+        institution: institution,
+        price: price || 50,
+        description: bio,
+        image: targetPhoto,
+        rating: 5.0,
+        reviewsCount: 0,
+        available: true,
+        status: 'approved',
+        isCustom: true
+      };
+
+      if (existingTutorIndex !== -1) {
+        customTutors[existingTutorIndex] = {
+          ...customTutors[existingTutorIndex],
+          ...tutorListing,
+          status: 'approved'
+        };
+      } else {
+        customTutors.push(tutorListing);
+      }
+      localStorage.setItem('customTutors', JSON.stringify(customTutors));
+
+      // 6. Update crm metadata
+      const savedCrmMeta = localStorage.getItem('admin_tutors_crm');
+      let crmMeta = savedCrmMeta ? JSON.parse(savedCrmMeta) : [];
+      const metaIndex = crmMeta.findIndex(m => m.id === tutorListing.id);
+      const newMeta = {
+        id: tutorListing.id,
+        workHoursLogged: 0,
+        sessionsCompleted: 0,
+        joinDate: new Date().toISOString().split('T')[0],
+        contractEndDate: '2027-10-01',
+        status: 'approved'
+      };
+      if (metaIndex !== -1) {
+        crmMeta[metaIndex] = { ...crmMeta[metaIndex], status: 'approved' };
+      } else {
+        crmMeta.push(newMeta);
+      }
+      localStorage.setItem('admin_tutors_crm', JSON.stringify(crmMeta));
+
+      // 7. Update status in tutor_applications
+      const apps = JSON.parse(localStorage.getItem('tutor_applications') || '[]');
+      const updatedApps = apps.map(a => {
+        if (a.id === app.id) {
+          return { ...a, status: 'approved' };
+        }
+        return a;
+      });
+      localStorage.setItem('tutor_applications', JSON.stringify(updatedApps));
+
+      toast.success(`Approved ${userName} as a tutor!`);
+      setIsTutorAppModalOpen(false);
+      setSelectedTutorApp(null);
+      loadAllData();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to approve tutor application.");
+    }
+  };
+
+  const handleDenyTutorApplicationSubmit = (appId) => {
+    try {
+      const apps = JSON.parse(localStorage.getItem('tutor_applications') || '[]');
+      const updatedApps = apps.map(a => {
+        if (a.id === appId) {
+          return { ...a, status: 'denied' };
+        }
+        return a;
+      });
+      localStorage.setItem('tutor_applications', JSON.stringify(updatedApps));
+
+      toast.success("Tutor application has been denied.");
+      setIsTutorAppModalOpen(false);
+      setSelectedTutorApp(null);
+      loadAllData();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to deny tutor application.");
+    }
+  };
+
   return (
     <div className="min-h-screen py-12 px-6 bg-surface-container-lowest dark:bg-slate-900">
       <div className="max-w-6xl mx-auto">
@@ -303,11 +620,14 @@ export default function AdminDashboard() {
               Manage system metrics, students, instructors, and revenue ledger accounts.
             </p>
           </div>
-          {stats.pendingTutorsCount > 0 && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/30 text-amber-800 dark:text-amber-400 rounded-xl text-xs font-extrabold animate-pulse">
+          {stats.totalPendingApprovals > 0 && (
+            <button
+              onClick={() => setActiveTab('approvals')}
+              className="flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/30 text-amber-800 dark:text-amber-400 rounded-xl text-xs font-extrabold animate-pulse hover:bg-amber-200 transition-colors"
+            >
               <span className="material-symbols-outlined text-[18px]">gpp_maybe</span>
-              {stats.pendingTutorsCount} Pending Tutor Approvals
-            </div>
+              {stats.totalPendingApprovals} Pending Approval Requests
+            </button>
           )}
         </div>
 
@@ -317,12 +637,13 @@ export default function AdminDashboard() {
             { id: 'analytics', label: 'Overall Analytics', icon: 'monitoring' },
             { id: 'students', label: 'Student Management', icon: 'school' },
             { id: 'tutors', label: 'Tutor Management', icon: 'groups' },
-            { id: 'financials', label: 'Financials & Payments', icon: 'account_balance_wallet' }
+            { id: 'financials', label: 'Financials & Payments', icon: 'account_balance_wallet' },
+            { id: 'approvals', label: 'Approval Queue & Requests', icon: 'rule', badge: stats.totalPendingApprovals }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-3 rounded-xl font-extrabold text-xs transition-all flex items-center gap-2 active:scale-95 ${
+              className={`px-5 py-3 rounded-xl font-extrabold text-xs transition-all flex items-center gap-2 active:scale-95 relative ${
                 activeTab === tab.id
                   ? 'bg-primary text-on-secondary shadow-md'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
@@ -330,6 +651,11 @@ export default function AdminDashboard() {
             >
               <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
               {tab.label}
+              {tab.badge > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center text-[10px] font-extrabold shadow-sm">
+                  {tab.badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -960,6 +1286,384 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* TAB 5: APPROVAL QUEUE & REQUESTS (TAB E) */}
+        {activeTab === 'approvals' && (
+          <div className="space-y-10 animate-in fade-in duration-300">
+            {/* Subsection 1: Tutor Applications Approval Queue */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">engineering</span>
+                Tutor Applications Approval Queue
+              </h2>
+              <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400 font-extrabold border-b border-outline-variant/30 dark:border-slate-700">
+                        <th className="px-6 py-4">Applicant Name</th>
+                        <th className="px-6 py-4">Institution</th>
+                        <th className="px-6 py-4">Subjects</th>
+                        <th className="px-6 py-4">Rate (Hourly)</th>
+                        <th className="px-6 py-4">Application Date</th>
+                        <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
+                      {tutorApplications.length > 0 ? (
+                        tutorApplications.map(app => (
+                          <tr key={app.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                            <td className="px-6 py-4">
+                              <p className="font-bold text-gray-900 dark:text-white text-sm">{app.userName}</p>
+                              <p className="text-gray-500 text-[10px]">{app.userEmail}</p>
+                            </td>
+                            <td className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">
+                              {app.institution}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="px-2 py-0.5 bg-primary/10 text-primary dark:text-primary-fixed-dim rounded font-semibold text-[10px]">
+                                {app.subjects?.join(', ') || 'N/A'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
+                              ${app.price}/hr
+                            </td>
+                            <td className="px-6 py-4 text-gray-500 font-semibold">
+                              {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : 'N/A'}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`inline-block px-2 py-0.5 rounded font-extrabold text-[10px] uppercase ${
+                                app.status === 'approved'
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                  : app.status === 'denied'
+                                  ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                  : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 animate-pulse'
+                              }`}>
+                                {app.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              {app.status === 'pending' ? (
+                                <button
+                                  onClick={() => openTutorAppReview(app)}
+                                  className="px-3 py-1.5 bg-primary text-on-secondary rounded-xl font-bold hover:opacity-90 transition-all active:scale-95 text-[10px]"
+                                >
+                                  Review Application
+                                </button>
+                              ) : (
+                                <span className="text-gray-400 font-medium text-[10px]">Reviewed</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="7" className="text-center py-10 text-gray-500 font-semibold">
+                            No pending tutor applications.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Subsection 2: Identity Profile Change Requests */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">badge</span>
+                Identity Profile Change Requests
+              </h2>
+              <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400 font-extrabold border-b border-outline-variant/30 dark:border-slate-700">
+                        <th className="px-6 py-4">User Details</th>
+                        <th className="px-6 py-4">Current Info Summary</th>
+                        <th className="px-6 py-4">Requested Updates</th>
+                        <th className="px-6 py-4">Request Date</th>
+                        <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
+                      {changeRequests.length > 0 ? (
+                        changeRequests.map(req => {
+                          const changesCount = Object.keys(req.requestedChanges).filter(
+                            key => req.requestedChanges[key] !== req.oldValues[key]
+                          ).length;
+
+                          return (
+                            <tr key={req.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                              <td className="px-6 py-4">
+                                <p className="font-bold text-gray-900 dark:text-white text-sm">{req.userName}</p>
+                                <p className="text-gray-500 text-[10px]">{req.userEmail}</p>
+                              </td>
+                              <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                                <p className="text-[10px]">Name: <span className="font-semibold">{req.oldValues.displayName || 'N/A'}</span></p>
+                                <p className="text-[10px]">ID: <span className="font-semibold">{req.oldValues.studentTutorId || 'N/A'}</span></p>
+                              </td>
+                              <td className="px-6 py-4 font-bold text-primary dark:text-primary-fixed-dim">
+                                {changesCount} proposed changes
+                              </td>
+                              <td className="px-6 py-4 text-gray-500 font-semibold">
+                                {req.requestedAt ? new Date(req.requestedAt).toLocaleDateString() : 'N/A'}
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className={`inline-block px-2 py-0.5 rounded font-extrabold text-[10px] uppercase ${
+                                  req.status === 'approved'
+                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                    : req.status === 'denied'
+                                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                    : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 animate-pulse'
+                                }`}>
+                                  {req.status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                {req.status === 'pending' ? (
+                                  <button
+                                    onClick={() => openRequestReview(req)}
+                                    className="px-3 py-1.5 bg-primary text-on-secondary rounded-xl font-bold hover:opacity-90 transition-all active:scale-95 text-[10px]"
+                                  >
+                                    Review & Approve
+                                  </button>
+                                ) : (
+                                  <span className="text-gray-400 font-medium text-[10px]">Reviewed</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan="6" className="text-center py-10 text-gray-500 font-semibold">
+                            No pending profile change requests.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: Review Profile Change Request (Selective approvals) */}
+        {isRequestModalOpen && selectedRequest && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div className="w-full max-w-[620px] bg-white dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary">rate_review</span>
+                    Review Identity Profile Changes
+                  </h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Submitted by {selectedRequest.userName} ({selectedRequest.userEmail})
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsRequestModalOpen(false);
+                    setSelectedRequest(null);
+                  }}
+                  className="p-1.5 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                >
+                  <span className="material-symbols-outlined text-gray-500">close</span>
+                </button>
+              </div>
+
+              <form onSubmit={handleApproveChangeRequestSubmit} className="space-y-6">
+                <div className="bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-outline-variant/30 dark:border-slate-800 overflow-hidden">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-bold border-b border-outline-variant/30 dark:border-slate-700">
+                        <th className="px-4 py-3">Field Name</th>
+                        <th className="px-4 py-3">Current Value</th>
+                        <th className="px-4 py-3">Requested Update</th>
+                        <th className="px-4 py-3 text-center">Approve?</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200/50 dark:divide-slate-800/80">
+                      {[
+                        { key: 'displayName', label: 'Full Name', oldVal: selectedRequest.oldValues.displayName, newVal: selectedRequest.requestedChanges.displayName },
+                        { key: 'email', label: 'Email Address', oldVal: selectedRequest.oldValues.email, newVal: selectedRequest.requestedChanges.email },
+                        { key: 'role', label: 'Account Role', oldVal: selectedRequest.oldValues.role, newVal: selectedRequest.requestedChanges.role },
+                        { key: 'studentTutorId', label: 'Student/Tutor ID', oldVal: selectedRequest.oldValues.studentTutorId, newVal: selectedRequest.requestedChanges.studentTutorId }
+                      ].map(field => {
+                        const hasChanged = field.oldVal !== field.newVal;
+
+                        return (
+                          <tr key={field.key} className={hasChanged ? 'bg-amber-50/30 dark:bg-amber-950/10' : 'opacity-60'}>
+                            <td className="px-4 py-3.5 font-bold text-gray-800 dark:text-gray-200">
+                              {field.label}
+                            </td>
+                            <td className="px-4 py-3.5 text-red-600 dark:text-red-400 font-mono break-all max-w-[140px]">
+                              {field.oldVal || '(Empty)'}
+                            </td>
+                            <td className={`px-4 py-3.5 font-mono break-all max-w-[160px] ${hasChanged ? 'text-green-600 dark:text-green-400 font-bold' : 'text-gray-500'}`}>
+                              {field.newVal || '(Empty)'}
+                            </td>
+                            <td className="px-4 py-3.5 text-center">
+                              <input
+                                type="checkbox"
+                                disabled={!hasChanged}
+                                checked={!!approvedFields[field.key]}
+                                onChange={(e) => setApprovedFields({ ...approvedFields, [field.key]: e.target.checked })}
+                                className="w-4 h-4 rounded text-primary focus:ring-primary/20 cursor-pointer disabled:cursor-not-allowed"
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-outline-variant/30 dark:border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => handleDenyChangeRequest(selectedRequest.id)}
+                    className="px-5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-2 border border-red-200"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">close</span>
+                    Deny Full Request
+                  </button>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsRequestModalOpen(false);
+                        setSelectedRequest(null);
+                      }}
+                      className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-bold rounded-xl"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 bg-primary text-on-secondary rounded-xl text-xs font-bold shadow hover:opacity-95 transition-all active:scale-95 flex items-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">done_all</span>
+                      Submit Decision
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: Review Tutor Application */}
+        {isTutorAppModalOpen && selectedTutorApp && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div className="w-full max-w-[540px] bg-white dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary">engineering</span>
+                    Review Tutor Application
+                  </h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Submitted by {selectedTutorApp.userName} on {new Date(selectedTutorApp.appliedAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsTutorAppModalOpen(false);
+                    setSelectedTutorApp(null);
+                  }}
+                  className="p-1.5 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                >
+                  <span className="material-symbols-outlined text-gray-500">close</span>
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Side-by-side details */}
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div className="p-3 bg-gray-50 dark:bg-slate-800/50 border border-outline-variant/30 dark:border-slate-800 rounded-2xl">
+                    <span className="text-[10px] font-bold text-gray-400 block mb-1">APPLICANT EMAIL</span>
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">{selectedTutorApp.userEmail}</span>
+                  </div>
+                  <div className="p-3 bg-gray-50 dark:bg-slate-800/50 border border-outline-variant/30 dark:border-slate-800 rounded-2xl">
+                    <span className="text-[10px] font-bold text-gray-400 block mb-1">PROPOSED PRICE RATE</span>
+                    <span className="font-bold text-primary dark:text-primary-fixed-dim">${selectedTutorApp.price}/hr</span>
+                  </div>
+                  <div className="p-3 bg-gray-50 dark:bg-slate-800/50 border border-outline-variant/30 dark:border-slate-800 rounded-2xl">
+                    <span className="text-[10px] font-bold text-gray-400 block mb-1">SPECIALTY SUBJECTS</span>
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">{selectedTutorApp.subjects.join(', ')}</span>
+                  </div>
+                  <div className="p-3 bg-gray-50 dark:bg-slate-800/50 border border-outline-variant/30 dark:border-slate-800 rounded-2xl">
+                    <span className="text-[10px] font-bold text-gray-400 block mb-1">MEDICAL INSTITUTION</span>
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">{selectedTutorApp.institution}</span>
+                  </div>
+                </div>
+
+                {/* Professional Bio Statement */}
+                <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border border-outline-variant/30 dark:border-slate-800 rounded-2xl text-xs space-y-2">
+                  <span className="text-[10px] font-bold text-gray-400 block">PROFESSIONAL BIO / STATEMENT</span>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed italic">
+                    "{selectedTutorApp.bio}"
+                  </p>
+                </div>
+
+                {/* Credentials file attachment */}
+                <div className="flex items-center justify-between p-3 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-primary/10 text-xs">
+                  <div className="flex items-center gap-2 text-primary dark:text-primary-fixed-dim">
+                    <span className="material-symbols-outlined">attachment</span>
+                    <span className="font-bold">Medical Credentials Attachment</span>
+                  </div>
+                  <a
+                    href={selectedTutorApp.credentialsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1 bg-white hover:bg-gray-50 text-gray-800 font-extrabold border border-gray-200 rounded-xl transition-all shadow-sm flex items-center gap-1 active:scale-95 text-[10px]"
+                  >
+                    View Credential PDF
+                    <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  </a>
+                </div>
+
+                {/* Footer Controls */}
+                <div className="flex justify-between items-center pt-4 border-t border-outline-variant/30 dark:border-slate-800">
+                  <button
+                    onClick={() => handleDenyTutorApplicationSubmit(selectedTutorApp.id)}
+                    className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold border border-red-200 transition-all active:scale-95 flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">close</span>
+                    Deny Applicant
+                  </button>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setIsTutorAppModalOpen(false);
+                        setSelectedTutorApp(null);
+                      }}
+                      className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-bold rounded-xl"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => handleApproveTutorApplication(selectedTutorApp)}
+                      className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold shadow transition-all active:scale-95 flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">done</span>
+                      Approve & Promote
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
