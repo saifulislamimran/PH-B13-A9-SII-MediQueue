@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
   baseURL: 
     (typeof globalThis !== 'undefined' && globalThis.process?.env?.NEXT_PUBLIC_API_URL) || 
     import.meta.env.VITE_API_URL || 
-    'https://mediqueue-server.vercel.app/api',
+    'https://ph-b13-a9-sii-mediqueue-server.vercel.app/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
