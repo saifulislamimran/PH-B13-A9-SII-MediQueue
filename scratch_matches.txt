@@ -1,0 +1,942 @@
+=== Step 0 (Source: USER_EXPLICIT, Type: USER_INPUT) ===
+<USER_REQUEST>
+Act as an Expert Senior Frontend Architect. I have reviewed the recent implementation, and there are several missing features and crucial UI/UX updates that must be completed. 
+
+Please note that we previously missed a core task regarding Profile Editing (Task 7 from our earlier architecture design). I have merged it here under Task 4. 
+
+This is STILL a STRICTLY Frontend (Client-side) environment. Build the complete UI layout, states, filters, and mock functions so they are fully interactive and production-ready. Implement these 4 tasks step-by-step.
+
+---
+
+🎨 Task 2: Financials & Payments Ecosystem (Advanced Ledger & Excel View)
+- Location: Admin Dashboard -> Financials & Payments.
+- Automated Description Logic: In the "Record Transaction" modal, replace the raw text description input. If a booking occurs automatically in the app (e.g., Student books an Anatomy session), auto-populate the ledger payload. For manual logging, turn the field into a searchable Combobox linked to existing student/tutor data.
+- PDF/Receipt Download: Add a small Action Icon (e.g., Download/File Icon) to the right side of EVERY individual transaction row. Clicking this should trigger a mock function to download that specific transaction receipt as a PDF or image.
+- Advanced Date Filtering: Add filters for "Daily", "Weekly", and "Monthly" timelines above the table.
+- Excel-Style Frozen Total Row: 
+  - Below the transaction rows, implement a static summary banner or a CSS-Sticky Bottom Row (`bottom-0 sticky bg-slate-900`) that acts like a frozen row in Excel.
+  - This row must display the Cash Flow Total (Total Inflows minus Outflows).
+  - Crucial UX: If the ledger has many rows, the table body must be scrollable (`max-h-[400px] overflow-y-auto`), but the Total Row must remain permanently frozen/visible at the bottom and update its calculated sum dynamically based on the active Daily/Weekly/Monthly filter.
+
+### 🎨 Task 2: Comprehensive Edit Profile Upgrades (CRITICAL)
+- Location: User Profile Page -> "Editable Profile Settings" section.
+- Password Change Block (New): Create a complete, fully interactive form section containing fields for "Current Password", "New Password", and "Confirm Password" with built-in real-time UI validation state matching.
+- Global Standard Profile Picture Uploader (New): 
+  - Upgrade the current profile photo URL selector into a proper device file picker and Drag & Drop area (Pick from Gallery/Device).
+  - Add strict frontend validation: If the chosen file size exceeds 1MB (`file.size > 1024 * 1024`), block the selection and trigger a precise error Toast notification: "File size exceeds 1MB limit. Please upload a smaller image."
+  - Keep the traditional "Or paste image URL" text input underneath as a secondary fallback so the user has both options.
+- Note: The "Locked Identity Fields / Request Change" option remains untouched as previously designed.
+
+---
+
+Please start with Task 1 (Specialty Coverage) and Task 4 (Comprehensive Profile & Password Upgrades). Provide the updated code and the git commit message.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-05-22T21:05:42+06:00.
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Gemini 3.5 Flash (High). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>
+
+========================================
+
+=== Step 22 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will search for the term "specialty" or "speciality" in the codebase to see if there is a Task 1 or Specialty Coverage functionality that is already partially implemented, or if we can see what was done previously.
+
+========================================
+
+=== Step 23 (Source: MODEL, Type: GREP_SEARCH) ===
+Created At: 2026-05-22T15:07:26Z
+Completed At: 2026-05-22T15:07:27Z
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AddTutor.jsx","LineNumber":89,"LineContent":"      toast.error('Please select at least one specialty discipline.');"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AddTutor.jsx","LineNumber":281,"LineContent":"          {/* Specialty Discipline Multi-Select */}"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AddTutor.jsx","LineNumber":284,"LineContent":"              Specialty Disciplines (Select all that apply)"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":36,"LineContent":"  const [hoveredSpecialtyIndex, setHoveredSpecialtyIndex] = useState(null);"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":382,"LineContent":"    // Specialty Subject distribution"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":398,"LineContent":"    // Top Performing Specialty (based on bookings subject count)"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":405,"LineContent":"    let topSpecialty = 'None';"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":406,"LineContent":"    let topSpecialtyCount = 0;"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":408,"LineContent":"      if (count \u003e topSpecialtyCount) {"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":409,"LineContent":"        topSpecialtyCount = count;"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":410,"LineContent":"        topSpecialty = subject;"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":429,"LineContent":"      topSpecialty,"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\sr
+<truncated 3734 bytes>
+MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":1729,"LineContent":"                        const isHovered = hoveredSpecialtyIndex === index;"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":1737,"LineContent":"                            onMouseEnter={() =\u003e setHoveredSpecialtyIndex(index)}"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":1738,"LineContent":"                            onMouseLeave={() =\u003e setHoveredSpecialtyIndex(null)}"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":1745,"LineContent":"                              opacity: hoveredSpecialtyIndex !== null \u0026\u0026 !isHovered ? 0.5 : 1"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":2215,"LineContent":"                      \u003cth className=\"px-6 py-4\"\u003eSpecialty Discipline\u003c/th\u003e"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":2813,"LineContent":"                    \u003cspan className=\"text-[10px] font-bold text-gray-400 block mb-1\"\u003eSPECIALTY SUBJECTS\u003c/span\u003e"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":2971,"LineContent":"                {/* Specialty Discipline Multi-Select */}"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":2974,"LineContent":"                    Specialty Disciplines (Select all that apply)"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\Home.jsx","LineNumber":137,"LineContent":"                Filter by specialty, institution, and availability to find your perfect match."}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\TutorDetails.jsx","LineNumber":158,"LineContent":"                \u003ch2 className=\"text-lg font-bold text-gray-900 dark:text-white mb-3\"\u003eSpecialty Disciplines\u003c/h2\u003e"}
+
+========================================
+
+=== Step 24 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will view the `AdminDashboard.jsx` file around line 1576 to see the current implementation of the "Specialty Coverage" section.
+
+========================================
+
+=== Step 45 (Source: MODEL, Type: VIEW_FILE) ===
+Created At: 2026-05-22T15:07:57Z
+Completed At: 2026-05-22T15:07:57Z
+File Path: `file:///d:/PH%20Project/PH-B13-A9-SII-MediQueue/src/pages/AdminDashboard.jsx`
+Total Lines: 3137
+Total Bytes: 163643
+Showing lines 20 to 110
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+20:   useDocumentTitle('System CRM Dashboard');
+21: 
+22:   // Navigation state
+23:   const [activeTab, setActiveTab] = useState('analytics'); // 'analytics', 'students', 'tutors', 'financials', 'approvals'
+24: 
+25:   // CRM Data States
+26:   const [students, setStudents] = useState([]);
+27:   const [tutors, setTutors] = useState([]);
+28:   const [ledger, setLedger] = useState([]);
+29:   const [changeRequests, setChangeRequests] = useState([]);
+30:   const [tutorApplications, setTutorApplications] = useState([]);
+31:   const [bookings, setBookings] = useState([]);
+32: 
+33:   // Interactive Charts hover states
+34:   const [hoveredRevenueIndex, setHoveredRevenueIndex] = useState(null);
+35:   const [hoveredBookingIndex, setHoveredBookingIndex] = useState(null);
+36:   const [hoveredSpecialtyIndex, setHoveredSpecialtyIndex] = useState(null);
+37:   const [hoveredDonutSegment, setHoveredDonutSegment] = useState(null);
+38: 
+39:   // Form Modals states
+40:   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+41:   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
+42:   const [isAddTutorOpen, setIsAddTutorOpen] = useState(false);
+43: 
+44:   // Tutor Form States
+45:   const [tutorFullName, setTutorFullName] = useState('');
+46:   const [tutorEmail, setTutorEmail] = useState('');
+47:   const [tutorInstitution, setTutorInstitution] = useState('');
+48:   const [tutorDesignation, setTutorDesignation] = useState('Dr.');
+49:   const [tutorSelectedSubjects, setTutorSelectedSubjects] = useState([]);
+50:   const [tutorPrice, setTutorPrice] = useState('');
+51:   c
+<truncated 975 bytes>
+ail] = useState('');
+73:   const [assignedTutor, setAssignedTutor] = useState('');
+74:   const [scheduleDate, setScheduleDate] = useState('');
+75:   const [scheduleTime, setScheduleTime] = useState('10:00 AM - 11:00 AM');
+76:   const [performance, setPerformance] = useState('Good (85%)');
+77:   const [taskStatus, setTaskStatus] = useState('In Progress');
+78:   const [studentGeneratedId, setStudentGeneratedId] = useState('');
+79:   const [studentGeneratedPassword, setStudentGeneratedPassword] = useState('');
+80: 
+81:   // Student Search and Filter States
+82:   const [studentSearch, setStudentSearch] = useState('');
+83:   const [studentTutorFilter, setStudentTutorFilter] = useState('all');
+84:   const [studentStatusFilter, setStudentStatusFilter] = useState('all');
+85:   const [studentPerformanceFilter, setStudentPerformanceFilter] = useState('all');
+86: 
+87:   // Transaction Form Fields
+88:   const [txType, setTxType] = useState('inflow');
+89:   const [txDesc, setTxDesc] = useState('');
+90:   const [txAmount, setTxAmount] = useState('');
+91:   const [txStatus, setTxStatus] = useState('Completed');
+92:   const [txDate, setTxDate] = useState(new Date().toISOString().split('T')[0]);
+93: 
+94:   // Load and sync CRM data from localStorage
+95:   const loadAllData = () => {
+96:     // 1. Students CRM
+97:     let savedStudents = localStorage.getItem('admin_students');
+98:     if (!savedStudents) {
+99:       const defaultStudents = [
+100:         {
+101:           id: 'student-1',
+102:           name: 'Emma Watson',
+103:           email: 'emma.w@academy.edu',
+104:           assignedTutor: 'Dr. Sarah Johnson',
+105:           scheduleDate: '2026-05-25',
+106:           scheduleTime: '10:00 AM - 11:00 AM',
+107:           performance: 'Excellent (95%)',
+108:           taskStatus: 'Completed',
+109:           joinDate: '2026-02-15'
+110:         },
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+========================================
+
+=== Step 52 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will list the contents of the App Data Directory to check if there are any persistent planning or architecture markdown files (like implementation plans, tasks, or walkthroughs) that describe Task 1 (Specialty Coverage) or other tasks.
+
+========================================
+
+=== Step 54 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will search the workspace for "Specialty Coverage" to see where it appears.
+
+========================================
+
+=== Step 55 (Source: MODEL, Type: GREP_SEARCH) ===
+Created At: 2026-05-22T15:08:20Z
+Completed At: 2026-05-22T15:08:20Z
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":1576,"LineContent":"              {/* Specialty coverage */}"}
+{"File":"d:\\PH Project\\PH-B13-A9-SII-MediQueue\\src\\pages\\AdminDashboard.jsx","LineNumber":1580,"LineContent":"                  Specialty Coverage Share"}
+
+========================================
+
+=== Step 60 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will view the contents of the `README.md` in the workspace root to see if it documents any details about Task 1, Task 2, Task 3, or Task 4.
+
+========================================
+
+=== Step 62 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will run a git command to view the diffs of the last few commits. This will help us understand what was recently added and check if any parts of "Task 1" or "Task 4" were introduced there.
+
+========================================
+
+=== Step 64 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will view `AdminDashboard.jsx` from line 350 to 520 to see how the specialty calculations and distribution metrics are handled. This will show us if there are any issues or if the user is referring to this code for Task 1.
+
+========================================
+
+=== Step 65 (Source: MODEL, Type: VIEW_FILE) ===
+Created At: 2026-05-22T15:08:41Z
+Completed At: 2026-05-22T15:08:41Z
+File Path: `file:///d:/PH%20Project/PH-B13-A9-SII-MediQueue/src/pages/AdminDashboard.jsx`
+Total Lines: 3137
+Total Bytes: 163643
+Showing lines 350 to 520
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+350:           appointmentTime: '11:00 AM - 12:00 PM',
+351:           subject: 'Cardiology',
+352:           note: 'EKG diagnostics review.',
+353:           bookedAt: '2026-05-20T11:00:00.000Z',
+354:           status: 'Cancelled'
+355:         }
+356:       ];
+357:       localStorage.setItem('bookings', JSON.stringify(defaultBookings));
+358:       savedBookings = JSON.stringify(defaultBookings);
+359:     }
+360:     setBookings(JSON.parse(savedBookings));
+361:   };
+362: 
+363:   useEffect(() => {
+364:     loadAllData();
+365:   }, []);
+366: 
+367: 
+368: 
+369:   // Compute overall stats dynamically
+370:   const stats = useMemo(() => {
+371:     const totalTutors = tutors.length;
+372:     const totalStudents = students.length;
+373:     
+374:     // Bookings count from bookings DB
+375:     const totalBookings = bookings.length;
+376:     
+377:     // Financial Inflows/Outflows
+378:     const inflowTotal = ledger.filter(tx => tx.type === 'inflow' && tx.status === 'Completed').reduce((sum, tx) => sum + tx.amount, 0);
+379:     const outflowTotal = ledger.filter(tx => tx.type === 'outflow' && tx.status === 'Completed').reduce((sum, tx) => sum + tx.amount, 0);
+380:     const netProfit = inflowTotal - outflowTotal;
+381: 
+382:     // Specialty Subject distribution
+383:     const subjectDistribution = {};
+384:     tutors.forEach(t => {
+385:       t.subjects?.forEach(sub => {
+386:         subjectDistribution[sub] = (subjectDistribution[sub] || 0) + 1;
+387:       });
+388:     });
+389: 
+390:     // Bookings breakdown
+391:     const activeCount = bookings.filter(b => b.status === 'S
+<truncated 2904 bytes>
+);
+463: 
+464:     // Sort descending by totalCount
+465:     return data.sort((a, b) => b.totalCount - a.totalCount);
+466:   }, [tutors, bookings]);
+467: 
+468:   // Donut chart segment values calculated dynamically
+469:   const activeDonutCounts = useMemo(() => {
+470:     let tCount = 0;
+471:     let sCount = 0;
+472:     let title = "Overall Ratio";
+473:     let isSpecific = false;
+474: 
+475:     if (hoveredSpecialtyIndex !== null && specialtyShareData[hoveredSpecialtyIndex]) {
+476:       const active = specialtyShareData[hoveredSpecialtyIndex];
+477:       tCount = active.teacherCount;
+478:       sCount = active.studentCount;
+479:       title = active.subject;
+480:       isSpecific = true;
+481:     } else {
+482:       specialtyShareData.forEach(item => {
+483:         tCount += item.teacherCount;
+484:         sCount += item.studentCount;
+485:       });
+486:     }
+487: 
+488:     const total = tCount + sCount;
+489:     const tPct = total > 0 ? (tCount / total) * 100 : 0;
+490:     const sPct = total > 0 ? (sCount / total) * 100 : 0;
+491: 
+492:     return {
+493:       tCount,
+494:       sCount,
+495:       total,
+496:       tPct,
+497:       sPct,
+498:       title,
+499:       isSpecific
+500:     };
+501:   }, [hoveredSpecialtyIndex, specialtyShareData]);
+502: 
+503:   // Coordinates and data calculations for charts
+504:   const monthlyRevenue = useMemo(() => {
+505:     const baseRevenue = {
+506:       '2025-12': 1200,
+507:       '2026-01': 1450,
+508:       '2026-02': 1100,
+509:       '2026-03': 1650,
+510:       '2026-04': 1900,
+511:       '2026-05': 0
+512:     };
+513: 
+514:     let mayInflow = 0;
+515:     ledger.forEach(tx => {
+516:       if (tx.type === 'inflow' && tx.status === 'Completed' && tx.date.startsWith('2026-05')) {
+517:         mayInflow += tx.amount;
+518:       }
+519:     });
+520:     baseRevenue['2026-05'] = 1500 + mayInflow;
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+========================================
+
+=== Step 74 (Source: MODEL, Type: VIEW_FILE) ===
+Created At: 2026-05-22T15:09:17Z
+Completed At: 2026-05-22T15:09:17Z
+File Path: `file:///d:/PH%20Project/PH-B13-A9-SII-MediQueue/src/pages/AdminDashboard.jsx`
+Total Lines: 3137
+Total Bytes: 163643
+Showing lines 1 to 800
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: import React, { useState, useEffect, useMemo } from 'react';
+2: import { mockTutors } from '../data/mockTutors';
+3: import useDocumentTitle from '../hooks/useDocumentTitle';
+4: import toast from 'react-hot-toast';
+5: 
+6: const AVAILABLE_SUBJECTS = [
+7:   "USMLE Step 1",
+8:   "Anatomy",
+9:   "Cardiology",
+10:   "Physiology",
+11:   "MCAT Prep",
+12:   "Biochemistry",
+13:   "Psychiatry",
+14:   "Behavioral Science",
+15:   "Internal Medicine",
+16:   "OSCE"
+17: ];
+18: 
+19: export default function AdminDashboard() {
+20:   useDocumentTitle('System CRM Dashboard');
+21: 
+22:   // Navigation state
+23:   const [activeTab, setActiveTab] = useState('analytics'); // 'analytics', 'students', 'tutors', 'financials', 'approvals'
+24: 
+25:   // CRM Data States
+26:   const [students, setStudents] = useState([]);
+27:   const [tutors, setTutors] = useState([]);
+28:   const [ledger, setLedger] = useState([]);
+29:   const [changeRequests, setChangeRequests] = useState([]);
+30:   const [tutorApplications, setTutorApplications] = useState([]);
+31:   const [bookings, setBookings] = useState([]);
+32: 
+33:   // Interactive Charts hover states
+34:   const [hoveredRevenueIndex, setHoveredRevenueIndex] = useState(null);
+35:   const [hoveredBookingIndex, setHoveredBookingIndex] = useState(null);
+36:   const [hoveredSpecialtyIndex, setHoveredSpecialtyIndex] = useState(null);
+37:   const [hoveredDonutSegment, setHoveredDonutSegment] = useState(null);
+38: 
+39:   // Form Modals states
+40:   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+41:   const [isAddTxOpen, setIsAddTxOpen] 
+<truncated 31816 bytes>
+ge.setItem('customTutors', JSON.stringify(customTutors));
+751: 
+752:       // 5. Add default metadata to CRM admin state
+753:       const savedCrmMeta = localStorage.getItem('admin_tutors_crm');
+754:       let crmMeta = savedCrmMeta ? JSON.parse(savedCrmMeta) : [];
+755:       crmMeta.push({
+756:         id: newTutorListing.id,
+757:         workHoursLogged: 0,
+758:         sessionsCompleted: 0,
+759:         joinDate: new Date().toISOString().split('T')[0],
+760:         contractEndDate: '2027-10-01',
+761:         status: 'approved'
+762:       });
+763:       localStorage.setItem('admin_tutors_crm', JSON.stringify(crmMeta));
+764: 
+765:       setTimeout(() => {
+766:         setTutorIsSubmitting(false);
+767:         toast.success(`Successfully registered Tutor ${tutorFullName}! Account created.`);
+768:         setIsAddTutorOpen(false);
+769: 
+770:         // Reset form fields
+771:         setTutorFullName('');
+772:         setTutorEmail('');
+773:         setTutorInstitution('');
+774:         setTutorDesignation('Dr.');
+775:         setTutorSelectedSubjects([]);
+776:         setTutorPrice('');
+777:         setTutorDescription('');
+778:         setTutorImage('');
+779:         
+780:         loadAllData();
+781:       }, 500);
+782: 
+783:     } catch (err) {
+784:       console.error(err);
+785:       toast.error('Failed to create listing. Please try again.');
+786:       setTutorIsSubmitting(false);
+787:     }
+788:   };
+789: 
+790:   // Actions: Student CRM
+791:   const handleAddStudentSubmit = (e) => {
+792:     e.preventDefault();
+793:     if (!studentName.trim() || !studentEmail.trim()) {
+794:       toast.error('Student Name and Email are required.');
+795:       return;
+796:     }
+797: 
+798:     if (!studentGeneratedId || !studentGeneratedPassword) {
+799:       toast.error('Student temporary credentials are not generated.');
+800:       return;
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+========================================
+
+=== Step 76 (Source: MODEL, Type: VIEW_FILE) ===
+Created At: 2026-05-22T15:09:19Z
+Completed At: 2026-05-22T15:09:20Z
+File Path: `file:///d:/PH%20Project/PH-B13-A9-SII-MediQueue/src/pages/AdminDashboard.jsx`
+Total Lines: 3137
+Total Bytes: 163643
+Showing lines 800 to 1599
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+800:       return;
+801:     }
+802: 
+803:     try {
+804:       const targetUid = `mock-uid-${Date.now()}`;
+805:       
+806:       // 1. Create registration user in mock_users_db
+807:       const db = JSON.parse(localStorage.getItem("mock_users_db") || "[]");
+808:       
+809:       // Avoid duplicate emails
+810:       if (db.some(u => u.email.toLowerCase() === studentEmail.trim().toLowerCase())) {
+811:         toast.error('A user with this email already exists.');
+812:         return;
+813:       }
+814: 
+815:       const newUser = {
+816:         uid: targetUid,
+817:         email: studentEmail.trim(),
+818:         password: studentGeneratedPassword,
+819:         displayName: studentName.trim(),
+820:         photoURL: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCYGCzxWEJXxLkhf1ZYrj5iCh84lmUnuFIDoSiXPS9tqi0XSMFy4oxYx1xn2Xop9PmlOVqx4jt1JhIvBG3DiLzxIDtLLTADZTwB52L5pf5c316c1oOwwf8-LkKBCy_34v7Y7tYh1iOIE2XRVRcHmPQjOQcUe11o9LgOG_mqHWECPS3OaU6VUtzx2-COQ0AScUHCWmKa4gA4op6XAFa8Djiid3j6uw3jGOhed6HAhV8JyCKEidkTKoR7rw8DnYf844tpEPK98Sm2lQk',
+821:         role: 'student'
+822:       };
+823: 
+824:       db.push(newUser);
+825:       localStorage.setItem("mock_users_db", JSON.stringify(db));
+826: 
+827:       // 2. Set roles in localStorage
+828:       localStorage.setItem(`role_${targetUid}`, 'student');
+829:       localStorage.setItem(`role_${studentEmail.trim()}`, 'student');
+830: 
+831:       // 3. Set profile details in localStorage
+832:       const studentProfile = {
+833:         studentTutorId: studentGeneratedId,
+834:         institution: 'Harvard Medical School',
+83
+<truncated 40104 bytes>
+
+1572:             </div>
+1573: 
+1574:             {/* Detailed Distribution */}
+1575:             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+1576:               {/* Specialty coverage */}
+1577:               <div className="lg:col-span-2 bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col">
+1578:                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+1579:                   <span className="material-symbols-outlined text-primary">pie_chart</span>
+1580:                   Specialty Coverage Share
+1581:                 </h2>
+1582:                 
+1583:                 {specialtyShareData.length === 0 ? (
+1584:                   <div className="flex flex-col items-center justify-center py-12 text-center text-gray-505 dark:text-gray-400">
+1585:                     <span className="material-symbols-outlined text-4xl mb-2 text-gray-300">sentiment_dissatisfied</span>
+1586:                     <p className="font-extrabold text-sm">No tutor specialty data available.</p>
+1587:                   </div>
+1588:                 ) : (
+1589:                   <div className="flex flex-col sm:flex-row items-center justify-center gap-8 md:gap-12 flex-1">
+1590:                     {/* Donut Chart Canvas */}
+1591:                     <div className="relative w-48 h-48 flex-shrink-0">
+1592:                       <svg className="w-full h-full" viewBox="0 0 180 180">
+1593:                         {/* Gray background track */}
+1594:                         <circle
+1595:                           cx="90"
+1596:                           cy="90"
+1597:                           r="60"
+1598:                           fill="transparent"
+1599:                           className="stroke-gray-100 dark:stroke-slate-700"
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+========================================
+
+=== Step 112 (Source: MODEL, Type: CODE_ACTION) ===
+Created At: 2026-05-22T15:10:45Z
+Completed At: 2026-05-22T15:10:46Z
+The following changes were made by the replace_file_content tool to: d:\PH Project\PH-B13-A9-SII-MediQueue\src\pages\AdminDashboard.jsx. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -91,6 +91,87 @@
+   const [txStatus, setTxStatus] = useState('Completed');
+   const [txDate, setTxDate] = useState(new Date().toISOString().split('T')[0]);
+ 
++  // Ledger Filter and Combobox States
++  const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'daily', 'weekly', 'monthly'
++  const [isComboOpen, setIsComboOpen] = useState(false);
++
++  // Filtered ledger entries based on timeline selection
++  const filteredLedger = useMemo(() => {
++    const todayStr = '2026-05-22';
++    const today = new Date(todayStr);
++
++    return ledger.filter(tx => {
++      if (timeFilter === 'all') return true;
++
++      const txDate = new Date(tx.date);
++      if (isNaN(txDate.getTime())) return true;
++
++      const diffTime = today.getTime() - txDate.getTime();
++      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
++
++      if (timeFilter === 'daily') {
++        return tx.date === todayStr;
++      }
++      if (timeFilter === 'weekly') {
++        return diffDays >= 0 && diffDays < 7;
++      }
++      if (timeFilter === 'monthly') {
++        return tx.date.startsWith('2026-05');
++      }
++      return true;
++    });
++  }, [ledger, timeFilter]);
++
++  const filteredInflowTotal = useMemo(() => {
++    return filteredLedger
++      .filter(tx => tx.type === 'inflow' && tx.status === 'Completed')
++      .reduce((sum, tx) => sum + tx.amount, 0);
++  }, [filteredLedger]);
++
++  const filteredOutflowTotal = useMemo(() => {
++    return filteredLedger
++      .filter(tx => tx.type === 'outflow' && tx.status === 'Completed')
++      .reduce((sum, tx) => sum + tx.amount, 0);
++  }, [filteredLedger]);
++
++  const filteredNetProfit = useMemo(() => {
++    return filteredInflowTotal - filteredOutflowTotal;
++  }, [filteredInflowTotal, filteredOutflowTotal]);
++
++  // Combobox list suggestions derived from Students/Tutors CRM data
++  const comboboxSuggestions = useMemo(() => {
++    if (txType === 'inflow') {
++      return students.map(s => {
++        const specialty = s.performance.includes('Anatomy') || s.assignedTutor.includes('Sarah') ? 'Anatomy' : 
++                          s.assignedTutor.includes('Rivera') ? 'Cardiology' :
++                          s.assignedTutor.includes('Chen') ? 'Neurology' : 'OSCE';
++        return {
++          title: s.name,
++          subtitle: `Student Fee - Assigned: ${s.assignedTutor} (${specialty})`,
++          value: `Student Booking: ${s.name} (${specialty})`
++        };
++      });
++    } else {
++      return tutors.map(t => {
++        const specialty = t.subjects?.[0] || 'Medical Prep';
++        return {
++          title: t.name,
++          subtitle: `Tutor Payout - Specialty: ${specialty}`,
++          value: `Tutor Payout: ${t.name}`
++        };
++      });
++    }
++  }, [txType, students, tutors]);
++
++  const filteredComboSuggestions = useMemo(() => {
++    if (!txDesc) return comboboxSuggestions;
++    const search = txDesc.toLowerCase();
++    return comboboxSuggestions.filter(item =>
++      item.title.toLowerCase().includes(search) ||
++      item.value.toLowerCase().includes(search)
++    );
++  }, [comboboxSuggestions, txDesc]);
++
+   // Load and sync CRM data from localStorage
+   const loadAllData = () => {
+     // 1. Students CRM
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+
+========================================
+
+=== Step 145 (Source: MODEL, Type: VIEW_FILE) ===
+Created At: 2026-05-22T15:12:01Z
+Completed At: 2026-05-22T15:12:01Z
+File Path: `file:///d:/PH%20Project/PH-B13-A9-SII-MediQueue/src/pages/TutorDetails.jsx`
+Total Lines: 430
+Total Bytes: 22489
+Showing lines 1 to 200
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: import React, { useState } from 'react';
+2: import { useParams, Link, useNavigate } from 'react-router-dom';
+3: import { useAuth } from '../context/AuthContext';
+4: import { mockTutors } from '../data/mockTutors';
+5: import useDocumentTitle from '../hooks/useDocumentTitle';
+6: import { motion, AnimatePresence } from 'framer-motion';
+7: import toast from 'react-hot-toast';
+8: 
+9: export default function TutorDetails() {
+10:   const { id } = useParams();
+11:   const navigate = useNavigate();
+12:   const { user } = useAuth();
+13:   
+14:   // Find tutor by ID
+15:   const tutor = (() => {
+16:     const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
+17:     return [...customTutors, ...mockTutors].find((t) => t.id === id);
+18:   })();
+19:   useDocumentTitle(tutor ? `${tutor.name} Profile` : 'Tutor Details');
+20: 
+21:   // Modal State
+22:   const [isModalOpen, setIsModalOpen] = useState(false);
+23:   
+24:   // Booking Form States
+25:   const [bookingDate, setBookingDate] = useState('');
+26:   const [bookingTime, setBookingTime] = useState('10:00 AM');
+27:   const [selectedSubject, setSelectedSubject] = useState(tutor ? tutor.subjects[0] : '');
+28:   const [studentNote, setStudentNote] = useState('');
+29:   const [isSubmitting, setIsSubmitting] = useState(false);
+30: 
+31:   if (!tutor) {
+32:     return (
+33:       <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 bg-surface-container-lowest">
+34:         <span className="material-symbols-outlined text-outline text-6xl mb-4">person_off</span>
+35:         <h2 className="te
+<truncated 6460 bytes>
+onSettings: "'FILL' 1" }}>star</span>
+170:                     <span className="font-semibold ml-1 text-gray-900 dark:text-white">{tutor.rating} ({tutor.reviewsCount} reviews)</span>
+171:                   </div>
+172:                 </div>
+173:               </div>
+174: 
+175:               <div className="border-t border-outline-variant/30 dark:border-slate-700 pt-6">
+176:                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">About Tutor</h2>
+177:                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+178:                   {tutor.description}
+179:                 </p>
+180:               </div>
+181: 
+182:               <div className="border-t border-outline-variant/30 dark:border-slate-700 pt-6 mt-6">
+183:                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Specialty Disciplines</h2>
+184:                 <div className="flex flex-wrap gap-2">
+185:                   {tutor.subjects.map((sub, idx) => (
+186:                     <span
+187:                       key={idx}
+188:                       className="inline-flex items-center justify-center px-4 py-2 bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-200 rounded-xl text-sm font-semibold border border-blue-100 dark:border-blue-800/40"
+189:                     >
+190:                       {sub}
+191:                     </span>
+192:                   ))}
+193:                 </div>
+194:               </div>
+195:             </div>
+196: 
+197:             {/* Simulated Reviews Section */}
+198:             <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-outline-variant/30 dark:border-slate-700 shadow-sm">
+199:               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Student Feedback</h2>
+200:               <div className="space-y-6">
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+
+========================================
+
+=== Step 163 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will view the `implementation_plan.md` artifact to check if there are other tasks (e.g. Task 1, Task 3, Task 4 details) that were outlined previously and need to be completed.
+
+========================================
+
+=== Step 173 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will search the `transcript.jsonl` file using PowerShell's `Select-String` to retrieve the original list of tasks requested by the user, in case there are other tasks (such as Task 1, 3, etc.) that need attention.
+
+========================================
+
+=== Step 176 (Source: MODEL, Type: RUN_COMMAND) ===
+Created At: 2026-05-22T15:16:10Z
+Completed At: 2026-05-22T15:16:14Z
+
+				The command completed successfully.
+				Output:
+				
+C:\Users\nayem\.gemini\antigravity\brain\9b557aac-3868-4dd2-9e13-215d48d0beca\.system_generated\logs\transcript.jsonl:1
+:{"step_index":0,"source":"USER_EXPLICIT","type":"USER_INPUT","status":"DONE","created_at":"2026-05-22T15:05:42Z","cont
+ent":"<USER_REQUEST>\nAct as an Expert Senior Frontend Architect. I have reviewed the recent implementation, and there 
+are several missing features and crucial UI/UX updates that must be completed. \n\nPlease note that we previously 
+missed a core task regarding Profile Editing (Task 7 from our earlier architecture design). I have merged it here 
+under Task 4. \n\nThis is STILL a STRICTLY Frontend (Client-side) environment. Build the complete UI layout, states, 
+filters, and mock functions so they are fully interactive and production-ready. Implement these 4 tasks 
+step-by-step.\n\n---\n\n?? Task 2: Financials & Payments Ecosystem (Advanced Ledger & Excel View)\n- Location: Admin 
+Dashboard -> Financials & Payments.\n- Automated Description Logic: In the \"Record Transaction\" modal, replace the 
+raw text description input. If a booking occurs automatically in the app (e.g., Student books an Anatomy session), 
+auto-populate the ledger payload. For manual logging, turn the field into a searchable Combobox linked to existing 
+student/tutor data.\n- PDF/Receipt Download: Add a small Action Icon (e.g., Download/File Icon) to the right side of 
+EVERY individual transaction row. Clicking this should trigger a mock function to download that specific transaction 
+receipt as a PDF or image.\n- Advanced Date Filtering: Add filters for \"Daily\", \"Weekly\", and \"Monthly\" 
+timelines above the table.\n- Excel-Style Frozen Total Row: \n  - Below the transaction rows, implement a static 
+summary banner or a CSS-Sticky Bottom Row (`bottom-0 sticky bg-slate-900`) that acts like a frozen row in Excel.\n  - 
+This row must display the Cash Flow Total (T
+<truncated 692 bytes>
+andard Profile Picture Uploader (New): \n  - Upgrade the current profile photo 
+URL selector into a proper device file picker and Drag & Drop area (Pick from Gallery/Device).\n  - Add strict 
+frontend validation: If the chosen file size exceeds 1MB (`file.size > 1024 * 1024`), block the selection and trigger 
+a precise error Toast notification: \"File size exceeds 1MB limit. Please upload a smaller image.\"\n  - Keep the 
+traditional \"Or paste image URL\" text input underneath as a secondary fallback so the user has both options.\n- 
+Note: The \"Locked Identity Fields / Request Change\" option remains untouched as previously 
+designed.\n\n---\n\nPlease start with Task 1 (Specialty Coverage) and Task 4 (Comprehensive Profile & Password 
+Upgrades). Provide the updated code and the git commit message.\n</USER_REQUEST>\n<ADDITIONAL_METADATA>\nThe current 
+local time is: 2026-05-22T21:05:42+06:00.\n</ADDITIONAL_METADATA>\n<USER_SETTINGS_CHANGE>\nThe user changed setting 
+`Model Selection` from None to Gemini 3.5 Flash (High). No need to comment on this change if the user doesn't ask 
+about it. If reporting what model you are, please use a human readable name instead of the exact 
+string.\n</USER_SETTINGS_CHANGE>"}
+C:\Users\nayem\.gemini\antigravity\brain\9b557aac-3868-4dd2-9e13-215d48d0beca\.system_generated\logs\transcript.jsonl:1
+03:{"step_index":104,"source":"USER_EXPLICIT","type":"USER_INPUT","status":"DONE","created_at":"2026-05-22T15:10:27Z","
+content":"<USER_REQUEST>\napproved\n</USER_REQUEST>\n<ADDITIONAL_METADATA>\nThe current local time is: 
+2026-05-22T21:10:27+06:00.\n</ADDITIONAL_METADATA>"}
+C:\Users\nayem\.gemini\antigravity\brain\9b557aac-3868-4dd2-9e13-215d48d0beca\.system_generated\logs\transcript.jsonl:1
+63:{"step_index":165,"source":"USER_EXPLICIT","type":"USER_INPUT","status":"DONE","created_at":"2026-05-22T15:15:42Z","
+content":"<USER_REQUEST>\ndo all \n</USER_REQUEST>\n<ADDITIONAL_METADATA>\nThe current local time is: 
+2026-05-22T21:15:42+06:00.\n</ADDITIONAL_METADATA>"}
+
+
+
+
+
+========================================
+
+=== Step 177 (Source: MODEL, Type: PLANNER_RESPONSE) ===
+I will search the `transcript.jsonl` file using PowerShell to find references to "Task 1" or "Specialty Coverage" to understand what those tasks were and if they have already been completed or if we need to do them now.
+
+========================================
+
+=== Step 178 (Source: MODEL, Type: RUN_COMMAND) ===
+Created At: 2026-05-22T15:16:17Z
+Completed At: 2026-05-22T15:16:25Z
+
+				The command completed successfully.
+				Output:
+				<truncated 96 lines>
+     toast.error('A user with this email already exists.');\n812:         return;\n813:       }\n814: \n815:       
+const newUser = {\n816:         uid: targetUid,\n817:         email: studentEmail.trim(),\n818:         password: 
+studentGeneratedPassword,\n819:         displayName: studentName.trim(),\n820:         photoURL: 'https://lh3.googleuse
+rcontent.com/aida-public/AB6AXuCYGCzxWEJXxLkhf1ZYrj5iCh84lmUnuFIDoSiXPS9tqi0XSMFy4oxYx1xn2Xop9PmlOVqx4jt1JhIvBG3DiLzxID
+tLLTADZTwB52L5pf5c316c1oOwwf8-LkKBCy_34v7Y7tYh1iOIE2XRVRcHmPQjOQcUe11o9LgOG_mqHWECPS3OaU6VUtzx2-COQ0AScUHCWmKa4gA4op6XA
+Fa8Djiid3j6uw3jGOhed6HAhV8JyCKEidkTKoR7rw8DnYf844tpEPK98Sm2lQk',\n821:         role: 'student'\n822:       };\n823: 
+\n824:       db.push(newUser);\n825:       localStorage.setItem(\"mock_users_db\", JSON.stringify(db));\n826: \n827:   
+    // 2. Set roles in localStorage\n828:       localStorage.setItem(`role_${targetUid}`, 'student');\n829:       
+localStorage.setItem(`role_${studentEmail.trim()}`, 'student');\n830: \n831:       // 3. Set profile details in 
+localStorage\n832:       const studentProfile = {\n833:         studentTutorId: studentGeneratedId,\n834:         
+institution: 'Harvard Medical School',\n83\n<truncated 40104 bytes>\n\n1572:             </div>\n1573: \n1574:         
+    {/* Detailed Distribution */}\n1575:             <div className=\"grid grid-cols-1 lg:grid-cols-3 gap-8\">\n1576:  
+             {/* Specialty coverage */}\n1577:               <div className=\"lg:col-span-2 bg-white dark:bg-slate-800 
+border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col\">\n1578:        
+         <h2 className=\"text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2\">\n1579:        
+           <span className=\"material-symbols-outlined text-primary\">pie_chart</span>\n1580:                   
+Sp
+<truncated 4159 bytes>
+ strict \r\nfrontend validation: If the chosen file size exceeds 
+1MB (`file.size > 1024 * 1024`), block the selection and trigger \r\na precise error Toast notification: \\\"File size 
+exceeds 1MB limit. Please upload a smaller image.\\\"\\n  - Keep the \r\ntraditional \\\"Or paste image URL\\\" text 
+input underneath as a secondary fallback so the user has both options.\\n- \r\nNote: The \\\"Locked Identity Fields / 
+Request Change\\\" option remains untouched as previously \r\ndesigned.\\n\\n---\\n\\nPlease start with Task 1 
+(Specialty Coverage) and Task 4 (Comprehensive Profile & Password \r\nUpgrades). Provide the updated code and the git 
+commit message.\\n</USER_REQUEST>\\n<ADDITIONAL_METADATA>\\nThe current \r\nlocal time is: 
+2026-05-22T21:05:42+06:00.\\n</ADDITIONAL_METADATA>\\n<USER_SETTINGS_CHANGE>\\nThe user changed setting \r\n`Model 
+Selection` from None to Gemini 3.5 Flash (High). No need to comment on this change if the user doesn't ask \r\nabout 
+it. If reporting what model you are, please use a human readable name instead of the exact \r\nstring.\\n</USER_SETTING
+S_CHANGE>\"}\r\nC:\\Users\\nayem\\.gemini\\antigravity\\brain\\9b557aac-3868-4dd2-9e13-215d48d0beca\\.system_generated\
+\logs\\transcript.jsonl:1\r\n03:{\"step_index\":104,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"D
+ONE\",\"created_at\":\"2026-05-22T15:10:27Z\",\"\r\ncontent\":\"<USER_REQUEST>\\napproved\\n</USER_REQUEST>\\n<ADDITION
+AL_METADATA>\\nThe current local time is: \r\n2026-05-22T21:10:27+06:00.\\n</ADDITIONAL_METADATA>\"}\r\nC:\\Users\\naye
+m\\.gemini\\antigravity\\brain\\9b557aac-3868-4dd2-9e13-215d48d0beca\\.system_generated\\logs\\transcript.jsonl:1\r\n63
+:{\"step_index\":165,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"DONE\",\"created_at\":\"2026-05-
+22T15:15:42Z\",\"\r\ncontent\":\"<USER_REQUEST>\\ndo all \\n</USER_REQUEST>\\n<ADDITIONAL_METADATA>\\nThe current 
+local time is: \r\n2026-05-22T21:15:42+06:00.\\n</ADDITIONAL_METADATA>\"}\r\n\r\n\r\n\n"}
+
+
+
+
+
+========================================
+
+=== Step 191 (Source: MODEL, Type: RUN_COMMAND) ===
+Created At: 2026-05-22T15:17:02Z
+Completed At: 2026-05-22T15:17:06Z
+
+				The command completed successfully.
+				Output:
+				{"step_index":0,"source":"USER_EXPLICIT","type":"USER_INPUT","status":"DONE","created_at":"2026-05-22T15:05:42Z","content":"<USER_REQUEST>\nAct as an Expert Senior Frontend Architect. I have reviewed the recent implementation, and there are several missing features and crucial UI/UX updates that must be completed. \n\nPlease note that we previously missed a core task regarding Profile Editing (Task 7 from our earlier architecture design). I have merged it here under Task 4. \n\nThis is STILL a STRICTLY Frontend (Client-side) environment. Build the complete UI layout, states, filters, and mock functions so they are fully interactive and production-ready. Implement these 4 tasks step-by-step.\n\n---\n\ndYZ" Task 2: Financials & Payments Ecosystem (Advanced Ledger & Excel View)\n- Location: Admin Dashboard -> Financials & Payments.\n- Automated Description Logic: In the \"Record Transaction\" modal, replace the raw text description input. If a booking occurs automatically in the app (e.g., Student books an Anatomy session), auto-populate the ledger payload. For manual logging, turn the field into a searchable Combobox linked to existing student/tutor data.\n- PDF/Receipt Download: Add a small Action Icon (e.g., Download/File Icon) to the right side of EVERY individual transaction row. Clicking this should trigger a mock function to download that specific transaction receipt as a PDF or image.\n- Advanced Date Filtering: Add filters for \"Daily\", \"Weekly\", and \"Monthly\" timelines above the table.\n- Excel-Style Frozen Total Row: \n  - Below the transaction rows, implement a static summary banner or a CSS-Sticky Bottom Row (`bottom-0 sticky bg-slate-900`) that acts like a frozen row in Excel.\n  - This row must display the Cash Flow Total (Total Inflows minus Outflows).\n  - Crucial UX: If the ledger has many rows, the table body must be scrollable (`max-h-[400px] overflow-y-auto`), but the Total Row must remain permanently frozen/visible at the bottom and update its calculated sum dynamically based on the active Daily/Weekly/Monthly filter.\n\n### dYZ" Task 2: Comprehensive Edit Profile Upgrades (CRITICAL)\n- Location: User Profile Page -> \"Editable Profile Settings\" section.\n- Password Change Block (New): Create a complete, fully interactive form section containing fields for \"Current Password\", \"New Password\", and \"Confirm Password\" with built-in real-time UI validation state matching.\n- Global Standard Profile Picture Uploader (New): \n  - Upgrade the current profile photo URL selector into a proper device file picker and Drag & Drop area (Pick from Gallery/Device).\n  - Add strict frontend validation: If the chosen file size exceeds 1MB (`file.size > 1024 * 1024`), block the selection and trigger a precise error Toast notification: \"File size exceeds 1MB limit. Please upload a smaller image.\"\n  - Keep the traditional \"Or paste image URL\" text input underneath as a secondary fallback so the user has both options.\n- Note: The \"Locked Identity Fields / Request Change\" option remains untouched as previously designed.\n\n---\n\nPlease start with Task 1 (Specialty Coverage) and Task 4 (Comprehensive Profile & Password Upgrades). Provide the updated code and the git commit message.\n</USER_REQUEST>\n<ADDITIONAL_METADATA>\nThe current local time is: 2026-05-22T21:05:42+06:00.\n</ADDITIONAL_METADATA>\n<USER_SETTINGS_CHANGE>\nThe user changed setting `Model Selection` from None to Gemini 3.5 Flash (High). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.\n</USER_SETTINGS_CHANGE>"}
+{"step_index":1,"source":"SYSTEM","type":"CONVERSATION_HISTORY","status":"DONE","created_at":"2026-05-22T15:05:43Z"}
+
+
+
+========================================
+
+=== Step 203 (Source: MODEL, Type: VIEW_FILE) ===
+Created At: 2026-05-22T15:17:37Z
+Completed At: 2026-05-22T15:17:37Z
+File Path: `file:///d:/PH%20Project/PH-B13-A9-SII-MediQueue/scratch_requests.md`
+Total Lines: 57
+Total Bytes: 3872
+Showing lines 1 to 57
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: === STEP 0 ===
+2: <USER_REQUEST>
+3: Act as an Expert Senior Frontend Architect. I have reviewed the recent implementation, and there are several missing features and crucial UI/UX updates that must be completed. 
+4: 
+5: Please note that we previously missed a core task regarding Profile Editing (Task 7 from our earlier architecture design). I have merged it here under Task 4. 
+6: 
+7: This is STILL a STRICTLY Frontend (Client-side) environment. Build the complete UI layout, states, filters, and mock functions so they are fully interactive and production-ready. Implement these 4 tasks step-by-step.
+8: 
+9: ---
+10: 
+11: 🎨 Task 2: Financials & Payments Ecosystem (Advanced Ledger & Excel View)
+12: - Location: Admin Dashboard -> Financials & Payments.
+13: - Automated Description Logic: In the "Record Transaction" modal, replace the raw text description input. If a booking occurs automatically in the app (e.g., Student books an Anatomy session), auto-populate the ledger payload. For manual logging, turn the field into a searchable Combobox linked to existing student/tutor data.
+14: - PDF/Receipt Download: Add a small Action Icon (e.g., Download/File Icon) to the right side of EVERY individual transaction row. Clicking this should trigger a mock function to download that specific transaction receipt as a PDF or image.
+15: - Advanced Date Filtering: Add filters for "Daily", "Weekly", and "Monthly" timelines above the table.
+16: - Excel-Style Frozen Total Row: 
+17:   - Below the transaction rows, implement a static summary banner or a CSS-Sticky Bottom Row (`botto
+<truncated 525 bytes>
+Profile Page -> "Editable Profile Settings" section.
+23: - Password Change Block (New): Create a complete, fully interactive form section containing fields for "Current Password", "New Password", and "Confirm Password" with built-in real-time UI validation state matching.
+24: - Global Standard Profile Picture Uploader (New): 
+25:   - Upgrade the current profile photo URL selector into a proper device file picker and Drag & Drop area (Pick from Gallery/Device).
+26:   - Add strict frontend validation: If the chosen file size exceeds 1MB (`file.size > 1024 * 1024`), block the selection and trigger a precise error Toast notification: "File size exceeds 1MB limit. Please upload a smaller image."
+27:   - Keep the traditional "Or paste image URL" text input underneath as a secondary fallback so the user has both options.
+28: - Note: The "Locked Identity Fields / Request Change" option remains untouched as previously designed.
+29: 
+30: ---
+31: 
+32: Please start with Task 1 (Specialty Coverage) and Task 4 (Comprehensive Profile & Password Upgrades). Provide the updated code and the git commit message.
+33: </USER_REQUEST>
+34: <ADDITIONAL_METADATA>
+35: The current local time is: 2026-05-22T21:05:42+06:00.
+36: </ADDITIONAL_METADATA>
+37: <USER_SETTINGS_CHANGE>
+38: The user changed setting `Model Selection` from None to Gemini 3.5 Flash (High). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+39: </USER_SETTINGS_CHANGE>
+40: 
+41: === STEP 104 ===
+42: <USER_REQUEST>
+43: approved
+44: </USER_REQUEST>
+45: <ADDITIONAL_METADATA>
+46: The current local time is: 2026-05-22T21:10:27+06:00.
+47: </ADDITIONAL_METADATA>
+48: 
+49: === STEP 165 ===
+50: <USER_REQUEST>
+51: do all 
+52: </USER_REQUEST>
+53: <ADDITIONAL_METADATA>
+54: The current local time is: 2026-05-22T21:15:42+06:00.
+55: </ADDITIONAL_METADATA>
+56: 
+57: 
+The above content shows the entire, complete file contents of the requested file.
+
+
+========================================
+
+=== Step 205 (Source: MODEL, Type: RUN_COMMAND) ===
+Created At: 2026-05-22T15:17:38Z
+Completed At: 2026-05-22T15:17:43Z
+
+				The command completed successfully.
+				Output:
+				
+pages\AddTutor.jsx:89:      toast.error('Please select at least one specialty discipline.');
+pages\AddTutor.jsx:281:          {/* Specialty Discipline Multi-Select */}
+pages\AddTutor.jsx:284:              Specialty Disciplines (Select all that apply)
+pages\AdminDashboard.jsx:36:  const [hoveredSpecialtyIndex, setHoveredSpecialtyIndex] = useState(null);
+pages\AdminDashboard.jsx:145:        const specialty = s.performance.includes('Anatomy') || 
+s.assignedTutor.includes('Sarah') ? 'Anatomy' : 
+pages\AdminDashboard.jsx:150:          subtitle: `Student Fee - Assigned: ${s.assignedTutor} (${specialty})`,
+pages\AdminDashboard.jsx:151:          value: `Student Booking: ${s.name} (${specialty})`
+pages\AdminDashboard.jsx:156:        const specialty = t.subjects?.[0] || 'Medical Prep';
+pages\AdminDashboard.jsx:159:          subtitle: `Tutor Payout - Specialty: ${specialty}`,
+pages\AdminDashboard.jsx:463:    // Specialty Subject distribution
+pages\AdminDashboard.jsx:479:    // Top Performing Specialty (based on bookings subject count)
+pages\AdminDashboard.jsx:486:    let topSpecialty = 'None';
+pages\AdminDashboard.jsx:487:    let topSpecialtyCount = 0;
+pages\AdminDashboard.jsx:489:      if (count > topSpecialtyCount) {
+pages\AdminDashboard.jsx:490:        topSpecialtyCount = count;
+pages\AdminDashboard.jsx:491:        topSpecialty = subject;
+pages\AdminDashboard.jsx:510:      topSpecialty,
+pages\AdminDashboard.jsx:511:      topSpecialtyCount,
+pages\AdminDashboard.jsx:521:  // Specialty Breakdown share data for Donut Chart (Teacher vs Student Tracking)
+pages\AdminDashboard.jsx:522:  const specialtyShareData = useMemo(() => {
+pages\AdminDashboard.jsx:556:    if (hoveredSpecialtyIndex !== null && specialtyShareData[hoveredSpecialtyIndex]) {
+pages\AdminDashboard.jsx:557:      const active = specialtyShareData[hoveredSpecialtyIndex];
+pages\AdminDashboard.jsx:563:      specialtyShar
+<truncated 606 bytes>
+an>
+pages\AdminDashboard.jsx:1584:                  <span className="text-[10px] text-gray-400 block font-semibold 
+truncate">{stats.topSpecialtyCount} bookings</span>
+pages\AdminDashboard.jsx:1790:              {/* Specialty coverage */}
+pages\AdminDashboard.jsx:1794:                  Specialty Coverage Share
+pages\AdminDashboard.jsx:1797:                {specialtyShareData.length === 0 ? (
+pages\AdminDashboard.jsx:1800:                    <p className="font-extrabold text-sm">No tutor specialty data 
+available.</p>
+pages\AdminDashboard.jsx:1879:                              {specialtyShareData.reduce((sum, item) => sum + 
+item.teacherCount, 0)}
+pages\AdminDashboard.jsx:1891:                              {specialtyShareData.reduce((sum, item) => sum + 
+item.studentCount, 0)}
+pages\AdminDashboard.jsx:1942:                      {specialtyShareData.map((item, index) => {
+pages\AdminDashboard.jsx:1943:                        const isHovered = hoveredSpecialtyIndex === index;
+pages\AdminDashboard.jsx:1951:                            onMouseEnter={() => setHoveredSpecialtyIndex(index)}
+pages\AdminDashboard.jsx:1952:                            onMouseLeave={() => setHoveredSpecialtyIndex(null)}
+pages\AdminDashboard.jsx:1959:                              opacity: hoveredSpecialtyIndex !== null && !isHovered ? 
+0.5 : 1
+pages\AdminDashboard.jsx:2429:                      <th className="px-6 py-4">Specialty Discipline</th>
+pages\AdminDashboard.jsx:3143:                    <span className="text-[10px] font-bold text-gray-400 block 
+mb-1">SPECIALTY SUBJECTS</span>
+pages\AdminDashboard.jsx:3301:                {/* Specialty Discipline Multi-Select */}
+pages\AdminDashboard.jsx:3304:                    Specialty Disciplines (Select all that apply)
+pages\Home.jsx:137:                Filter by specialty, institution, and availability to find your perfect match.
+pages\TutorDetails.jsx:183:                <h2 className="text-lg font-bold text-gray-900 dark:text-white 
+mb-3">Specialty Disciplines</h2>
+
+
+
+
+
+========================================
+
