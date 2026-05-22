@@ -638,7 +638,7 @@ export default function MyBookings() {
                     {bookings.map((booking) => (
                       <div
                         key={booking.bookingId}
-                        className="bg-white dark:bg-slate-850 border border-outline-variant/30 dark:border-slate-800 rounded-3xl p-6 shadow-md flex flex-col justify-between relative hover:shadow-lg transition-shadow"
+                        className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-md flex flex-col justify-between relative hover:shadow-lg transition-shadow dark:text-gray-100"
                       >
                         {/* Session details */}
                         <div>
@@ -658,23 +658,23 @@ export default function MyBookings() {
                             </div>
                           </div>
 
-                          <div className="p-4 bg-gray-50 dark:bg-slate-800/40 rounded-2xl space-y-2.5 mb-4 border border-gray-100 dark:border-slate-800">
+                          <div className="p-4 bg-gray-50 dark:bg-slate-900/40 rounded-2xl space-y-2.5 mb-4 border border-gray-100 dark:border-slate-700">
                             <div className="flex justify-between items-center text-xs">
-                              <span className="font-semibold text-gray-500">Subject:</span>
+                              <span className="font-semibold text-gray-500 dark:text-gray-400">Subject:</span>
                               <span className="px-2.5 py-0.5 bg-primary/10 text-primary dark:text-primary-fixed-dim rounded font-bold text-[9px] uppercase tracking-wider">
                                 {booking.subject}
                               </span>
                             </div>
                             <div className="flex justify-between items-center text-xs">
-                              <span className="font-semibold text-gray-500">Scheduled Date:</span>
+                              <span className="font-semibold text-gray-500 dark:text-gray-400">Scheduled Date:</span>
                               <span className="text-gray-900 dark:text-gray-100 font-bold">{booking.appointmentDate}</span>
                             </div>
                             <div className="flex justify-between items-center text-xs">
-                              <span className="font-semibold text-gray-500">Time Slot:</span>
+                              <span className="font-semibold text-gray-500 dark:text-gray-400">Time Slot:</span>
                               <span className="text-gray-900 dark:text-gray-100 font-bold">{booking.appointmentTime}</span>
                             </div>
                             <div className="flex justify-between items-center text-xs">
-                              <span className="font-semibold text-gray-500">Booking Status:</span>
+                              <span className="font-semibold text-gray-500 dark:text-gray-400">Booking Status:</span>
                               <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide ${
                                 booking.status === 'Rescheduled'
                                   ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
@@ -744,7 +744,7 @@ export default function MyBookings() {
                 {myTutors.map((tutor) => (
                   <div
                     key={tutor.id}
-                    className="bg-white dark:bg-slate-850 border border-outline-variant/30 dark:border-slate-800 rounded-3xl p-6 shadow-md flex flex-col justify-between"
+                    className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-md flex flex-col justify-between dark:text-gray-100"
                   >
                     <div>
                       {/* Premium Tutor Card Layout */}

@@ -3,6 +3,19 @@ import { mockTutors } from '../data/mockTutors';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import toast from 'react-hot-toast';
 
+const AVAILABLE_SUBJECTS = [
+  "USMLE Step 1",
+  "Anatomy",
+  "Cardiology",
+  "Physiology",
+  "MCAT Prep",
+  "Biochemistry",
+  "Psychiatry",
+  "Behavioral Science",
+  "Internal Medicine",
+  "OSCE"
+];
+
 export default function AdminDashboard() {
   useDocumentTitle('System CRM Dashboard');
 
@@ -15,10 +28,29 @@ export default function AdminDashboard() {
   const [ledger, setLedger] = useState([]);
   const [changeRequests, setChangeRequests] = useState([]);
   const [tutorApplications, setTutorApplications] = useState([]);
+  const [bookings, setBookings] = useState([]);
+
+  // Interactive Charts hover states
+  const [hoveredRevenueIndex, setHoveredRevenueIndex] = useState(null);
+  const [hoveredBookingIndex, setHoveredBookingIndex] = useState(null);
 
   // Form Modals states
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
+  const [isAddTutorOpen, setIsAddTutorOpen] = useState(false);
+
+  // Tutor Form States
+  const [tutorFullName, setTutorFullName] = useState('');
+  const [tutorEmail, setTutorEmail] = useState('');
+  const [tutorInstitution, setTutorInstitution] = useState('');
+  const [tutorDesignation, setTutorDesignation] = useState('Dr.');
+  const [tutorSelectedSubjects, setTutorSelectedSubjects] = useState([]);
+  const [tutorPrice, setTutorPrice] = useState('');
+  const [tutorDescription, setTutorDescription] = useState('');
+  const [tutorImage, setTutorImage] = useState('');
+  const [tutorGeneratedUserId, setTutorGeneratedUserId] = useState('');
+  const [tutorGeneratedPassword, setTutorGeneratedPassword] = useState('');
+  const [tutorIsSubmitting, setTutorIsSubmitting] = useState(false);
 
   // Review Modals states
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
@@ -194,6 +226,128 @@ export default function AdminDashboard() {
       savedApps = JSON.stringify(defaultApps);
     }
     setTutorApplications(JSON.parse(savedApps));
+
+    // 6. Bookings
+    let savedBookings = localStorage.getItem('bookings');
+    if (!savedBookings) {
+      const defaultBookings = [
+        {
+          bookingId: 'book-1',
+          tutorId: 'tutor-1',
+          tutorName: 'Dr. Sarah Johnson',
+          tutorImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDdffOm4FzYt5mQ3FTPrPiZd80rHNIKmTAH_gsfiPB8cHfyPk5XU8BIZsImafY0vys07CFjjH1Nnti9npsPPLR9eAe1Om6gLBYVZPaNXfOZ2ZqNLKxHg3YopK-L6T7Es_zwkCa4c5ZOBfdtxK8owUfr-iMqlU4vh1O4d6pROVtXaUC7RmioXnU7GzvCvnAEM-LMwamkKc4pmc6YzJX70U04rqkRqT3S2iglaa5hJu6G4BhPMcKU9ELubnHiGz63dLt6b97DrewVU_U',
+          tutorInstitution: 'Johns Hopkins Medicine',
+          price: 85,
+          studentName: 'Emma Watson',
+          studentEmail: 'emma.w@academy.edu',
+          appointmentDate: '2026-05-25',
+          appointmentTime: '10:00 AM - 11:00 AM',
+          subject: 'Anatomy',
+          note: 'Focused study on upper limbs anatomy and musculoskeletal paths.',
+          bookedAt: '2026-05-18T10:00:00.000Z',
+          status: 'Scheduled'
+        },
+        {
+          bookingId: 'book-2',
+          tutorId: 'tutor-2',
+          tutorName: 'Alex Rivera',
+          tutorImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBUT-lUH9Xzcp4ImZhI9HvgpPzofHXv5Kur__rVyyro66_Z9o1pzbAUewou71j0yXiKgEZTBP7s54_XOPBGcUOBdFzy1o55drXwtts5IWVOdlTF2IhYYwSvpJZS5dTs6e_OwhlvMPy2eoYjseuG2B3lxZ4gwnhH0enVqQj2CvdgvhXNhSr2_coVn3fmcyi38Syu19mEL6oVpZWLR3zbnD1UO2jPpu-SqkDXQIFxaQKSTN9QbEgPaxQnikSuoQnBGgztwL2bqki1HhY',
+          tutorInstitution: 'Mayo Clinic Alix School of Medicine',
+          price: 65,
+          studentName: 'Lucas Miller',
+          studentEmail: 'lucas.m@medical.edu',
+          appointmentDate: '2026-05-19',
+          appointmentTime: '02:00 PM - 03:00 PM',
+          subject: 'Cardiology',
+          note: 'Need help interpreting challenging EKG strips and murmurs.',
+          bookedAt: '2026-05-17T14:00:00.000Z',
+          status: 'Completed'
+        },
+        {
+          bookingId: 'book-3',
+          tutorId: 'tutor-3',
+          tutorName: 'Dr. Michael Chen',
+          tutorImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDMsvpRf2euKElhnl2Ivijp189mW7UjXC-lo5pR29grHVYFpADzfc435MUcyk52O3AOlqTToNbP9dWUH_R0F7zIXZxhZwom8EnRN8itFB22PPv32kIgK78XOGindM61BvsCwbHh_G_KxQ-w4ZgUuatya4ch6mQIaHrC8X6fYQk_8Ec2COGqQA_wjWCfiXsqGqID2rFLHiNZFAGFQMDld7BLbB2XlTHYKaRmKdAPrrvaqyAjqqnYu2BrH9ztQMlLYySCWurudWTHGGs',
+          tutorInstitution: 'Harvard Medical School',
+          price: 95,
+          studentName: 'Sophia Chen',
+          studentEmail: 'sophia.c@university.edu',
+          appointmentDate: '2026-05-21',
+          appointmentTime: '11:00 AM - 12:00 PM',
+          subject: 'Neurology',
+          note: 'Brief review of neuropathology slides before the exam.',
+          bookedAt: '2026-05-16T11:00:00.000Z',
+          status: 'Cancelled'
+        },
+        {
+          bookingId: 'book-4',
+          tutorId: 'tutor-4',
+          tutorName: 'Jordan Smith',
+          tutorImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCYGCzxWEJXxLkhf1ZYrj5iCh84lmUnuFIDoSiXPS9tqi0XSMFy4oxYx1xn2Xop9PmlOVqx4jt1JhIvBG3DiLzxIDtLLTADZTwB52L5pf5c316c1oOwwf8-LkKBCy_34v7Y7tYh1iOIE2XRVRcHmPQjOQcUe11o9LgOG_mqHWECPS3OaU6VUtzx2-COQ0AScUHCWmKa4gA4op6XAFa8Djiid3j6uw3jGOhed6HAhV8JyCKEidkTKoR7rw8DnYf844tpEPK98Sm2lQk',
+          tutorInstitution: 'Stanford University School of Medicine',
+          price: 55,
+          studentName: 'Emma Watson',
+          studentEmail: 'emma.w@academy.edu',
+          appointmentDate: '2026-05-15',
+          appointmentTime: '04:00 PM - 05:00 PM',
+          subject: 'Biochemistry',
+          note: 'Glycolysis and Krebs cycle regulation questions.',
+          bookedAt: '2026-05-14T16:00:00.000Z',
+          status: 'Completed'
+        },
+        {
+          bookingId: 'book-5',
+          tutorId: 'tutor-5',
+          tutorName: 'Dr. Emily Blunt',
+          tutorImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTUWiFR0EtV_ArGCW8FkixIA1A0K4CSpfw3HsDrjVVtSQwIthlCURDOEY6UM_OkkTiNUt8bI-FLEHIDq8IFaZsLjRJ0_JYh5HsZg-KyNIqQsb8MnM4VNO7dmG8MKOkULrhXGnEoGWH18WTXbsiifg5em-LPQ90mQ5xLIVLYn0n_TPQi1B0OSlTjgo7VofbtHdMbys0DD1gwCfdP1DoSrfGUH_YyCRkDfwh9r21q4nb4e0KvLKp9P_Rw99xYt-p7dZk-XZ5eq2oI6g',
+          tutorInstitution: 'Massachusetts General Hospital',
+          price: 110,
+          studentName: 'Lucas Miller',
+          studentEmail: 'lucas.m@medical.edu',
+          appointmentDate: '2026-05-27',
+          appointmentTime: '09:00 AM - 10:00 AM',
+          subject: 'OSCE',
+          note: 'Mock OSCE exam with verbal communication feedback.',
+          bookedAt: '2026-05-20T09:00:00.000Z',
+          status: 'Scheduled'
+        },
+        {
+          bookingId: 'book-6',
+          tutorId: 'tutor-1',
+          tutorName: 'Dr. Sarah Johnson',
+          tutorImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDdffOm4FzYt5mQ3FTPrPiZd80rHNIKmTAH_gsfiPB8cHfyPk5XU8BIZsImafY0vys07CFjjH1Nnti9npsPPLR9eAe1Om6gLBYVZPaNXfOZ2ZqNLKxHg3YopK-L6T7Es_zwkCa4c5ZOBfdtxK8owUfr-iMqlU4vh1O4d6pROVtXaUC7RmioXnU7GzvCvnAEM-LMwamkKc4pmc6YzJX70U04rqkRqT3S2iglaa5hJu6G4BhPMcKU9ELubnHiGz63dLt6b97DrewVU_U',
+          tutorInstitution: 'Johns Hopkins Medicine',
+          price: 85,
+          studentName: 'Sophia Chen',
+          studentEmail: 'sophia.c@university.edu',
+          appointmentDate: '2026-05-20',
+          appointmentTime: '01:00 PM - 02:00 PM',
+          subject: 'Anatomy',
+          note: 'Deep dive into thorax vascular structures.',
+          bookedAt: '2026-05-18T13:00:00.000Z',
+          status: 'Completed'
+        },
+        {
+          bookingId: 'book-7',
+          tutorId: 'tutor-2',
+          tutorName: 'Alex Rivera',
+          tutorImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBUT-lUH9Xzcp4ImZhI9HvgpPzofHXv5Kur__rVyyro66_Z9o1pzbAUewou71j0yXiKgEZTBP7s54_XOPBGcUOBdFzy1o55drXwtts5IWVOdlTF2IhYYwSvpJZS5dTs6e_OwhlvMPy2eoYjseuG2B3lxZ4gwnhH0enVqQj2CvdgvhXNhSr2_coVn3fmcyi38Syu19mEL6oVpZWLR3zbnD1UO2jPpu-SqkDXQIFxaQKSTN9QbEgPaxQnikSuoQnBGgztwL2bqki1HhY',
+          tutorInstitution: 'Mayo Clinic Alix School of Medicine',
+          price: 65,
+          studentName: 'Emma Watson',
+          studentEmail: 'emma.w@academy.edu',
+          appointmentDate: '2026-05-22',
+          appointmentTime: '11:00 AM - 12:00 PM',
+          subject: 'Cardiology',
+          note: 'EKG diagnostics review.',
+          bookedAt: '2026-05-20T11:00:00.000Z',
+          status: 'Cancelled'
+        }
+      ];
+      localStorage.setItem('bookings', JSON.stringify(defaultBookings));
+      savedBookings = JSON.stringify(defaultBookings);
+    }
+    setBookings(JSON.parse(savedBookings));
   };
 
   useEffect(() => {
@@ -206,7 +360,6 @@ export default function AdminDashboard() {
     const totalStudents = students.length;
     
     // Bookings count from bookings DB
-    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
     const totalBookings = bookings.length;
     
     // Financial Inflows/Outflows
@@ -220,6 +373,30 @@ export default function AdminDashboard() {
       t.subjects?.forEach(sub => {
         subjectDistribution[sub] = (subjectDistribution[sub] || 0) + 1;
       });
+    });
+
+    // Bookings breakdown
+    const activeCount = bookings.filter(b => b.status === 'Scheduled').length;
+    const completedCount = bookings.filter(b => b.status === 'Completed').length;
+    const cancelledCount = bookings.filter(b => b.status === 'Cancelled').length;
+    const activeRatio = totalBookings > 0 ? Math.round((activeCount / totalBookings) * 100) : 0;
+    const completedRatio = totalBookings > 0 ? Math.round((completedCount / totalBookings) * 100) : 0;
+    const cancelledRatio = totalBookings > 0 ? Math.round((cancelledCount / totalBookings) * 100) : 0;
+
+    // Top Performing Specialty (based on bookings subject count)
+    const bookingSubjects = {};
+    bookings.forEach(b => {
+      if (b.subject) {
+        bookingSubjects[b.subject] = (bookingSubjects[b.subject] || 0) + 1;
+      }
+    });
+    let topSpecialty = 'None';
+    let topSpecialtyCount = 0;
+    Object.entries(bookingSubjects).forEach(([subject, count]) => {
+      if (count > topSpecialtyCount) {
+        topSpecialtyCount = count;
+        topSpecialty = subject;
+      }
     });
 
     const pendingAppsCount = tutorApplications.filter(a => a.status === 'pending').length;
@@ -236,14 +413,265 @@ export default function AdminDashboard() {
       subjectDistribution,
       pendingAppsCount,
       pendingRequestsCount,
-      totalPendingApprovals
+      totalPendingApprovals,
+      topSpecialty,
+      topSpecialtyCount,
+      activeCount,
+      completedCount,
+      cancelledCount,
+      activeRatio,
+      completedRatio,
+      cancelledRatio
     };
-  }, [tutors, students, ledger, tutorApplications, changeRequests]);
+  }, [tutors, students, ledger, tutorApplications, changeRequests, bookings]);
+
+  // Coordinates and data calculations for charts
+  const monthlyRevenue = useMemo(() => {
+    const baseRevenue = {
+      '2025-12': 1200,
+      '2026-01': 1450,
+      '2026-02': 1100,
+      '2026-03': 1650,
+      '2026-04': 1900,
+      '2026-05': 0
+    };
+
+    let mayInflow = 0;
+    ledger.forEach(tx => {
+      if (tx.type === 'inflow' && tx.status === 'Completed' && tx.date.startsWith('2026-05')) {
+        mayInflow += tx.amount;
+      }
+    });
+    baseRevenue['2026-05'] = 1500 + mayInflow;
+
+    return [
+      { month: 'Dec', revenue: baseRevenue['2025-12'] },
+      { month: 'Jan', revenue: baseRevenue['2026-01'] },
+      { month: 'Feb', revenue: baseRevenue['2026-02'] },
+      { month: 'Mar', revenue: baseRevenue['2026-03'] },
+      { month: 'Apr', revenue: baseRevenue['2026-04'] },
+      { month: 'May', revenue: baseRevenue['2026-05'] },
+    ];
+  }, [ledger]);
+
+  const revenueChartPoints = useMemo(() => {
+    const maxVal = Math.max(...monthlyRevenue.map(d => d.revenue), 1);
+    return monthlyRevenue.map((d, i) => {
+      const x = 50 + i * (420 / 5);
+      const y = 160 - (d.revenue / maxVal) * 110;
+      return { ...d, x, y };
+    });
+  }, [monthlyRevenue]);
+
+  const revenueLinePath = useMemo(() => {
+    if (revenueChartPoints.length === 0) return '';
+    let path = `M ${revenueChartPoints[0].x} ${revenueChartPoints[0].y}`;
+    for (let i = 0; i < revenueChartPoints.length - 1; i++) {
+      const p0 = revenueChartPoints[i];
+      const p1 = revenueChartPoints[i + 1];
+      const cpX1 = p0.x + (p1.x - p0.x) / 3;
+      const cpY1 = p0.y;
+      const cpX2 = p0.x + 2 * (p1.x - p0.x) / 3;
+      const cpY2 = p1.y;
+      path += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p1.x} ${p1.y}`;
+    }
+    return path;
+  }, [revenueChartPoints]);
+
+  const revenueAreaPath = useMemo(() => {
+    if (revenueChartPoints.length === 0) return '';
+    return `${revenueLinePath} L ${revenueChartPoints[revenueChartPoints.length - 1].x} 160 L ${revenueChartPoints[0].x} 160 Z`;
+  }, [revenueChartPoints, revenueLinePath]);
+
+  const dailyBookings = useMemo(() => {
+    const days = [];
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const refDate = new Date('2026-05-22T00:00:00');
+    
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(refDate);
+      d.setDate(refDate.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const label = `${weekdays[d.getDay()]} ${d.getDate()}`;
+      
+      const count = bookings.filter(b => b.appointmentDate === dateStr).length;
+      
+      days.push({
+        date: dateStr,
+        label,
+        count: count + (i === 1 || i === 3 ? 1 : 0)
+      });
+    }
+    return days;
+  }, [bookings]);
+
+  const bookingChartPoints = useMemo(() => {
+    const maxVal = Math.max(...dailyBookings.map(d => d.count), 1);
+    return dailyBookings.map((d, i) => {
+      const x = 50 + i * (420 / 6);
+      const height = (d.count / maxVal) * 110;
+      const y = 160 - height;
+      return { ...d, x, y, height, width: 32 };
+    });
+  }, [dailyBookings]);
 
   // Approved tutors list for selectors
   const approvedTutors = useMemo(() => {
     return tutors.filter(t => t.status === 'approved');
   }, [tutors]);
+
+  // Actions: Tutor CRM Manually Add
+  const generateTutorTempCredentials = () => {
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const userId = `MQ-TUT-${randomNum}`;
+    const password = `MQ-Temp-${randomStr}-${randomNum}!`;
+    setTutorGeneratedUserId(userId);
+    setTutorGeneratedPassword(password);
+  };
+
+  const toggleTutorSubject = (sub) => {
+    if (tutorSelectedSubjects.includes(sub)) {
+      setTutorSelectedSubjects(tutorSelectedSubjects.filter(s => s !== sub));
+    } else {
+      setTutorSelectedSubjects([...tutorSelectedSubjects, sub]);
+    }
+  };
+
+  const handleAddTutorSubmit = (e) => {
+    e.preventDefault();
+
+    // Validations
+    if (!tutorFullName.trim()) {
+      toast.error('Please enter the full name.');
+      return;
+    }
+
+    if (!tutorEmail.trim() || !tutorEmail.includes('@')) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+
+    if (!tutorInstitution.trim()) {
+      toast.error('Please specify the medical institution.');
+      return;
+    }
+
+    if (tutorSelectedSubjects.length === 0) {
+      toast.error('Please select at least one specialty discipline.');
+      return;
+    }
+
+    if (!tutorPrice || parseFloat(tutorPrice) <= 0) {
+      toast.error('Please enter a valid hourly rate greater than $0.');
+      return;
+    }
+
+    if (tutorDescription.trim().length < 20) {
+      toast.error('Please write a biography of at least 20 characters.');
+      return;
+    }
+
+    try {
+      setTutorIsSubmitting(true);
+
+      const targetUid = `mock-uid-${Date.now()}`;
+      
+      // 1. Create registration user in mock_users_db
+      const db = JSON.parse(localStorage.getItem("mock_users_db") || "[]");
+      
+      // Avoid duplicate emails
+      if (db.some(u => u.email.toLowerCase() === tutorEmail.trim().toLowerCase())) {
+        toast.error('A user with this email already exists.');
+        setTutorIsSubmitting(false);
+        return;
+      }
+
+      const newUser = {
+        uid: targetUid,
+        email: tutorEmail.trim(),
+        password: tutorGeneratedPassword,
+        displayName: tutorFullName.trim(),
+        photoURL: tutorImage.trim() || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCYGCzxWEJXxLkhf1ZYrj5iCh84lmUnuFIDoSiXPS9tqi0XSMFy4oxYx1xn2Xop9PmlOVqx4jt1JhIvBG3DiLzxIDtLLTADZTwB52L5pf5c316c1oOwwf8-LkKBCy_34v7Y7tYh1iOIE2XRVRcHmPQjOQcUe11o9LgOG_mqHWECPS3OaU6VUtzx2-COQ0AScUHCWmKa4gA4op6XAFa8Djiid3j6uw3jGOhed6HAhV8JyCKEidkTKoR7rw8DnYf844tpEPK98Sm2lQk',
+        role: 'tutor'
+      };
+
+      db.push(newUser);
+      localStorage.setItem("mock_users_db", JSON.stringify(db));
+
+      // 2. Set roles in localStorage
+      localStorage.setItem(`role_${targetUid}`, 'tutor');
+      localStorage.setItem(`role_${tutorEmail.trim()}`, 'tutor');
+
+      // 3. Set profile details in localStorage
+      const tutorProfile = {
+        studentTutorId: tutorGeneratedUserId,
+        institution: tutorInstitution.trim(),
+        designation: tutorDesignation.trim(),
+        subscriptionStatus: 'premium',
+        age: 35
+      };
+      localStorage.setItem(`profile_${targetUid}`, JSON.stringify(tutorProfile));
+      localStorage.setItem(`profile_${tutorEmail.trim()}`, JSON.stringify(tutorProfile));
+
+      // 4. Create Tutor Listing in customTutors
+      const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
+      const newTutorListing = {
+        id: `tutor-custom-${targetUid}`,
+        name: tutorFullName.trim(),
+        email: tutorEmail.trim(),
+        subjects: tutorSelectedSubjects,
+        price: parseFloat(tutorPrice),
+        description: tutorDescription.trim(),
+        institution: tutorInstitution.trim(),
+        image: newUser.photoURL,
+        rating: 5.0,
+        reviewsCount: 0,
+        available: true,
+        status: 'approved', // instantly approved since manually added
+        isCustom: true
+      };
+
+      customTutors.unshift(newTutorListing);
+      localStorage.setItem('customTutors', JSON.stringify(customTutors));
+
+      // 5. Add default metadata to CRM admin state
+      const savedCrmMeta = localStorage.getItem('admin_tutors_crm');
+      let crmMeta = savedCrmMeta ? JSON.parse(savedCrmMeta) : [];
+      crmMeta.push({
+        id: newTutorListing.id,
+        workHoursLogged: 0,
+        sessionsCompleted: 0,
+        joinDate: new Date().toISOString().split('T')[0],
+        contractEndDate: '2027-10-01',
+        status: 'approved'
+      });
+      localStorage.setItem('admin_tutors_crm', JSON.stringify(crmMeta));
+
+      setTimeout(() => {
+        setTutorIsSubmitting(false);
+        toast.success(`Successfully registered Tutor ${tutorFullName}! Account created.`);
+        setIsAddTutorOpen(false);
+
+        // Reset form fields
+        setTutorFullName('');
+        setTutorEmail('');
+        setTutorInstitution('');
+        setTutorDesignation('Dr.');
+        setTutorSelectedSubjects([]);
+        setTutorPrice('');
+        setTutorDescription('');
+        setTutorImage('');
+        
+        loadAllData();
+      }, 500);
+
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to create listing. Please try again.');
+      setTutorIsSubmitting(false);
+    }
+  };
 
   // Actions: Student CRM
   const handleAddStudentSubmit = (e) => {
@@ -710,6 +1138,238 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
+              {/* Metric 5: Average Session Duration */}
+              <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex items-center gap-4">
+                <div className="w-12 h-12 bg-purple-500/10 text-purple-650 dark:text-purple-400 rounded-2xl flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[28px]">pace</span>
+                </div>
+                <div>
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block">Avg Session Duration</span>
+                  <span className="text-2xl font-extrabold text-gray-900 dark:text-white">1.5 hrs</span>
+                </div>
+              </div>
+
+              {/* Metric 6: Student Retention Rate */}
+              <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex items-center gap-4">
+                <div className="w-12 h-12 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[28px]">trending_up</span>
+                </div>
+                <div>
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block">Student Retention</span>
+                  <span className="text-2xl font-extrabold text-gray-900 dark:text-white">87%</span>
+                </div>
+              </div>
+
+              {/* Metric 7: Top Performing Specialty */}
+              <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex items-center gap-4">
+                <div className="w-12 h-12 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-2xl flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[28px]">psychology</span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block">Top Specialty</span>
+                  <span className="text-xl font-extrabold text-gray-900 dark:text-white block truncate">{stats.topSpecialty}</span>
+                  <span className="text-[10px] text-gray-400 block font-semibold truncate">{stats.topSpecialtyCount} bookings</span>
+                </div>
+              </div>
+
+              {/* Metric 8: Active Bookings ratio */}
+              <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm flex flex-col justify-center gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-[24px]">event_available</span>
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block">Booking Status Ratios</span>
+                    <span className="text-xs font-bold text-gray-700 dark:text-gray-250 block truncate">
+                      Act: {stats.activeRatio}% | Comp: {stats.completedRatio}%
+                    </span>
+                  </div>
+                </div>
+                <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden flex">
+                  <div className="bg-emerald-500 h-full" style={{ width: `${stats.activeRatio}%` }} title={`Active: ${stats.activeRatio}%`}></div>
+                  <div className="bg-blue-500 h-full" style={{ width: `${stats.completedRatio}%` }} title={`Completed: ${stats.completedRatio}%`}></div>
+                  <div className="bg-red-400 h-full" style={{ width: `${stats.cancelledRatio}%` }} title={`Cancelled: ${stats.cancelledRatio}%`}></div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Interactive Charts Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              
+              {/* Chart A: Monthly Revenue Trend */}
+              <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 md:p-8 shadow-sm relative">
+                <div className="mb-4">
+                  <span className="text-xs font-bold text-primary dark:text-primary-fixed-dim uppercase tracking-wider block">Financial Performance</span>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">Monthly Revenue Trend</h3>
+                </div>
+
+                <div className="relative h-[200px] w-full">
+                  <svg className="w-full h-full" viewBox="0 0 500 200" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="revenueAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#24389c" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#24389c" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Grid Lines */}
+                    <line x1="50" y1="50" x2="470" y2="50" stroke="#f1f5f9" strokeDasharray="4 4" className="dark:stroke-slate-700" />
+                    <line x1="50" y1="105" x2="470" y2="105" stroke="#f1f5f9" strokeDasharray="4 4" className="dark:stroke-slate-700" />
+                    <line x1="50" y1="160" x2="470" y2="160" stroke="#cbd5e1" className="dark:stroke-slate-600" />
+
+                    {/* Y-Axis Labels */}
+                    <text x="40" y="54" textAnchor="end" className="text-[9px] font-bold fill-gray-400 dark:fill-gray-500">
+                      ${Math.max(...monthlyRevenue.map(d => d.revenue), 1)}
+                    </text>
+                    <text x="40" y="109" textAnchor="end" className="text-[9px] font-bold fill-gray-400 dark:fill-gray-500">
+                      ${Math.round(Math.max(...monthlyRevenue.map(d => d.revenue), 1) / 2)}
+                    </text>
+                    <text x="40" y="164" textAnchor="end" className="text-[9px] font-bold fill-gray-400 dark:fill-gray-500">
+                      $0
+                    </text>
+
+                    {/* Area path */}
+                    {revenueAreaPath && (
+                      <path d={revenueAreaPath} fill="url(#revenueAreaGrad)" />
+                    )}
+
+                    {/* Curved line path */}
+                    {revenueLinePath && (
+                      <path d={revenueLinePath} fill="none" stroke="#24389c" strokeWidth="3" strokeLinecap="round" className="dark:stroke-primary-fixed-dim" />
+                    )}
+
+                    {/* Interactive points */}
+                    {revenueChartPoints.map((point, idx) => (
+                      <g key={idx}>
+                        <circle
+                          cx={point.x}
+                          cy={point.y}
+                          r={hoveredRevenueIndex === idx ? 8 : 4}
+                          fill={hoveredRevenueIndex === idx ? '#ffffff' : '#24389c'}
+                          stroke={hoveredRevenueIndex === idx ? '#24389c' : '#ffffff'}
+                          strokeWidth={3}
+                          className="transition-all duration-150 cursor-pointer dark:stroke-slate-800 dark:fill-primary-fixed-dim"
+                          onMouseEnter={() => setHoveredRevenueIndex(idx)}
+                          onMouseLeave={() => setHoveredRevenueIndex(null)}
+                        />
+                        {/* Large invisible hover target */}
+                        <circle
+                          cx={point.x}
+                          cy={point.y}
+                          r={20}
+                          fill="transparent"
+                          className="cursor-pointer"
+                          onMouseEnter={() => setHoveredRevenueIndex(idx)}
+                          onMouseLeave={() => setHoveredRevenueIndex(null)}
+                        />
+                      </g>
+                    ))}
+
+                    {/* X-Axis Labels */}
+                    {revenueChartPoints.map((point, idx) => (
+                      <text
+                        key={idx}
+                        x={point.x}
+                        y="185"
+                        textAnchor="middle"
+                        className="text-[10px] font-bold fill-gray-500 dark:fill-gray-400"
+                      >
+                        {point.month}
+                      </text>
+                    ))}
+                  </svg>
+
+                  {/* Absolute HTML Tooltip */}
+                  {hoveredRevenueIndex !== null && (
+                    <div
+                      className="absolute bg-slate-900 text-white text-[11px] p-2.5 rounded-xl shadow-xl pointer-events-none border border-slate-700/80 z-20 flex flex-col font-bold animate-in fade-in duration-100"
+                      style={{
+                        left: `${(revenueChartPoints[hoveredRevenueIndex].x / 500) * 100}%`,
+                        top: `${(revenueChartPoints[hoveredRevenueIndex].y / 200) * 100}%`,
+                        transform: 'translate(-50%, -125%)'
+                      }}
+                    >
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wider">{revenueChartPoints[hoveredRevenueIndex].month} 2026</span>
+                      <span className="text-sm text-green-400 font-extrabold">${revenueChartPoints[hoveredRevenueIndex].revenue}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Chart B: Daily Booking Volume */}
+              <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 md:p-8 shadow-sm relative">
+                <div className="mb-4">
+                  <span className="text-xs font-bold text-secondary uppercase tracking-wider block">Activity Monitor</span>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">Daily Booking Volume</h3>
+                </div>
+
+                <div className="relative h-[200px] w-full">
+                  <svg className="w-full h-full" viewBox="0 0 500 200" preserveAspectRatio="none">
+                    {/* Grid Lines */}
+                    <line x1="50" y1="50" x2="470" y2="50" stroke="#f1f5f9" strokeDasharray="4 4" className="dark:stroke-slate-700" />
+                    <line x1="50" y1="105" x2="470" y2="105" stroke="#f1f5f9" strokeDasharray="4 4" className="dark:stroke-slate-700" />
+                    <line x1="50" y1="160" x2="470" y2="160" stroke="#cbd5e1" className="dark:stroke-slate-600" />
+
+                    {/* Y-Axis Labels */}
+                    <text x="40" y="54" textAnchor="end" className="text-[9px] font-bold fill-gray-400 dark:fill-gray-500">
+                      {Math.max(...dailyBookings.map(d => d.count), 1)}
+                    </text>
+                    <text x="40" y="109" textAnchor="end" className="text-[9px] font-bold fill-gray-400 dark:fill-gray-500">
+                      {Math.round(Math.max(...dailyBookings.map(d => d.count), 1) / 2)}
+                    </text>
+                    <text x="40" y="164" textAnchor="end" className="text-[9px] font-bold fill-gray-400 dark:fill-gray-500">
+                      0
+                    </text>
+
+                    {/* Rectangular Bars */}
+                    {bookingChartPoints.map((point, idx) => (
+                      <rect
+                        key={idx}
+                        x={point.x - point.width / 2}
+                        y={point.y}
+                        width={point.width}
+                        height={point.height}
+                        rx="6"
+                        ry="6"
+                        fill={hoveredBookingIndex === idx ? '#008d9e' : '#006876'}
+                        className="transition-all duration-150 cursor-pointer"
+                        onMouseEnter={() => setHoveredBookingIndex(idx)}
+                        onMouseLeave={() => setHoveredBookingIndex(null)}
+                      />
+                    ))}
+
+                    {/* X-Axis Labels */}
+                    {bookingChartPoints.map((point, idx) => (
+                      <text
+                        key={idx}
+                        x={point.x}
+                        y="185"
+                        textAnchor="middle"
+                        className="text-[10px] font-bold fill-gray-500 dark:fill-gray-400"
+                      >
+                        {point.label.split(' ')[0]}
+                      </text>
+                    ))}
+                  </svg>
+
+                  {/* Absolute HTML Tooltip */}
+                  {hoveredBookingIndex !== null && (
+                    <div
+                      className="absolute bg-slate-900 text-white text-[11px] p-2.5 rounded-xl shadow-xl pointer-events-none border border-slate-700/80 z-20 flex flex-col font-bold animate-in fade-in duration-100"
+                      style={{
+                        left: `${(bookingChartPoints[hoveredBookingIndex].x / 500) * 100}%`,
+                        top: `${(bookingChartPoints[hoveredBookingIndex].y / 200) * 100}%`,
+                        transform: 'translate(-50%, -125%)'
+                      }}
+                    >
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wider">{bookingChartPoints[hoveredBookingIndex].label}</span>
+                      <span className="text-sm text-cyan-400 font-extrabold">{bookingChartPoints[hoveredBookingIndex].count} Bookings</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
             </div>
 
             {/* Detailed Distribution */}
@@ -989,10 +1649,22 @@ export default function AdminDashboard() {
         {/* TAB 3: TUTOR MANAGEMENT */}
         {activeTab === 'tutors' && (
           <div className="space-y-6 animate-in fade-in duration-300">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">groups</span>
-              Medical Instructors CRM
-            </h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">groups</span>
+                Medical Instructors CRM
+              </h2>
+              <button
+                onClick={() => {
+                  generateTutorTempCredentials();
+                  setIsAddTutorOpen(true);
+                }}
+                className="px-4 py-2 bg-primary text-on-secondary rounded-xl text-xs font-bold flex items-center gap-2 shadow hover:opacity-90 transition-all active:scale-95"
+              >
+                <span className="material-symbols-outlined text-[18px]">person_add</span>
+                Add Tutor Manually
+              </button>
+            </div>
 
             {/* Tutors Grid/Table */}
             <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm">
@@ -1663,6 +2335,258 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: Manually Add Tutor */}
+        {isAddTutorOpen && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div className="w-full max-w-2xl bg-white dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary">person_add</span>
+                    Add Tutor Manually
+                  </h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Create instructor account and generate clinical tutoring profile.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsAddTutorOpen(false)}
+                  className="p-1.5 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                >
+                  <span className="material-symbols-outlined text-gray-500">close</span>
+                </button>
+              </div>
+
+              <form onSubmit={handleAddTutorSubmit} className="space-y-4">
+                {/* Identity fields */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Full Name</label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">person</span>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Dr. John Watson"
+                        className="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-xs font-semibold text-gray-900 dark:text-white"
+                        value={tutorFullName}
+                        onChange={(e) => setTutorFullName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Email Address</label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">mail</span>
+                      <input
+                        type="email"
+                        required
+                        placeholder="e.g. watson@medical.edu"
+                        className="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-xs font-semibold text-gray-900 dark:text-white"
+                        value={tutorEmail}
+                        onChange={(e) => setTutorEmail(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Institution & Designation */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Medical Institution</label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">school</span>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Cleveland Clinic, Mayo Clinic"
+                        className="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-xs font-semibold text-gray-900 dark:text-white"
+                        value={tutorInstitution}
+                        onChange={(e) => setTutorInstitution(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Academic Designation</label>
+                    <select
+                      className="w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl outline-none text-xs font-semibold text-gray-900 dark:text-white cursor-pointer"
+                      value={tutorDesignation}
+                      onChange={(e) => setTutorDesignation(e.target.value)}
+                    >
+                      <option value="Dr.">Dr.</option>
+                      <option value="Professor">Professor</option>
+                      <option value="Associate Professor">Associate Professor</option>
+                      <option value="Clinical Instructor">Clinical Instructor</option>
+                      <option value="Resident Physician">Resident Physician</option>
+                      <option value="MD Candidate">MD Candidate</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Specialty Discipline Multi-Select */}
+                <div>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-2">
+                    Specialty Disciplines (Select all that apply)
+                  </label>
+                  <div className="flex flex-wrap gap-2 p-4 bg-gray-50 dark:bg-slate-900/40 rounded-2xl border border-gray-150 dark:border-slate-800">
+                    {AVAILABLE_SUBJECTS.map((sub) => {
+                      const isSelected = tutorSelectedSubjects.includes(sub);
+                      return (
+                        <button
+                          key={sub}
+                          type="button"
+                          onClick={() => toggleTutorSubject(sub)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border flex items-center gap-1 ${
+                            isSelected
+                              ? 'bg-primary text-white border-primary shadow-sm scale-[1.02]'
+                              : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-750'
+                          }`}
+                        >
+                          {isSelected && (
+                            <span className="material-symbols-outlined text-[14px]">check</span>
+                          )}
+                          {sub}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Hourly Rate & Avatar URL */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Hourly Rate (USD)</label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">attach_money</span>
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        placeholder="e.g. 75"
+                        className="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-xs font-semibold text-gray-900 dark:text-white"
+                        value={tutorPrice}
+                        onChange={(e) => setTutorPrice(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Avatar Image URL (Optional)</label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">image</span>
+                      <input
+                        type="url"
+                        placeholder="https://example.com/dr-john.jpg"
+                        className="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-xs font-semibold text-gray-900 dark:text-white"
+                        value={tutorImage}
+                        onChange={(e) => setTutorImage(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Biography */}
+                <div>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Credentials & Teaching Bio</label>
+                  <textarea
+                    rows="3"
+                    required
+                    placeholder="Tell students about your medical background, teaching achievements (minimum 20 characters)..."
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-xs font-semibold text-gray-900 dark:text-white"
+                    value={tutorDescription}
+                    onChange={(e) => setTutorDescription(e.target.value)}
+                  ></textarea>
+                </div>
+
+                {/* Credential Generation Panel */}
+                <div className="p-4 bg-gray-50 dark:bg-slate-850/60 rounded-2xl border border-gray-200 dark:border-slate-700 space-y-3">
+                  <h3 className="text-xs font-extrabold text-gray-750 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[16px] text-primary">key</span>
+                    Generated Temp Credentials
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 block mb-0.5">Tutor ID / User ID</label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          readOnly
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-350 dark:border-slate-650 rounded-lg text-xs font-mono font-bold text-gray-800 dark:text-gray-200 outline-none"
+                          value={tutorGeneratedUserId}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(tutorGeneratedUserId);
+                            toast.success("User ID copied!");
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary flex items-center"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 block mb-0.5">Temporary Password</label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          readOnly
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-350 dark:border-slate-650 rounded-lg text-xs font-mono font-bold text-gray-800 dark:text-gray-200 outline-none"
+                          value={tutorGeneratedPassword}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(tutorGeneratedPassword);
+                            toast.success("Password copied!");
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary flex items-center"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button
+                    type="button"
+                    onClick={generateTutorTempCredentials}
+                    className="text-[11px] text-primary dark:text-primary-fixed-dim hover:underline font-bold flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">refresh</span>
+                    Regenerate Credentials
+                  </button>
+                </div>
+
+                {/* Footer buttons */}
+                <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddTutorOpen(false)}
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-bold rounded-xl"
+                    disabled={tutorIsSubmitting}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-primary text-on-secondary rounded-xl text-xs font-bold shadow hover:opacity-95 flex items-center gap-1 disabled:opacity-50"
+                    disabled={tutorIsSubmitting}
+                  >
+                    {tutorIsSubmitting ? 'Registering...' : 'Register Tutor'}
+                    <span className="material-symbols-outlined text-[16px]">how_to_reg</span>
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
