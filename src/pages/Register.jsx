@@ -11,6 +11,7 @@ export default function Register() {
 
   const [name, setName] = useState('');
   const [photoURL, setPhotoURL] = useState('');
+  const [role, setRole] = useState('student');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -43,12 +44,12 @@ export default function Register() {
 
     try {
       setIsLoading(true);
-      // 1. Create User
-      const userCredential = await registerUser(email, password);
+      // 1. Create User with role
+      const userCredential = await registerUser(email, password, role);
       
-      // 2. Sync profile details (name and avatar photo)
+      // 2. Sync profile details (name, avatar photo, and role)
       const finalPhoto = photoURL || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCYGCzxWEJXxLkhf1ZYrj5iCh84lmUnuFIDoSiXPS9tqi0XSMFy4oxYx1xn2Xop9PmlOVqx4jt1JhIvBG3DiLzxIDtLLTADZTwB52L5pf5c316c1oOwwf8-LkKBCy_34v7Y7tYh1iOIE2XRVRcHmPQjOQcUe11o9LgOG_mqHWECPS3OaU6VUtzx2-COQ0AScUHCWmKa4gA4op6XAFa8Djiid3j6uw3jGOhed6HAhV8JyCKEidkTKoR7rw8DnYf844tpEPK98Sm2lQk';
-      await updateUserProfile(name, finalPhoto);
+      await updateUserProfile(name, finalPhoto, role);
 
       toast.success('Registration successful! Welcome to MediQueue.');
       navigate('/');
@@ -131,6 +132,32 @@ export default function Register() {
                   onChange={(e) => setPhotoURL(e.target.value)}
                   disabled={isLoading}
                 />
+              </div>
+            </div>
+
+            {/* Account Role Selection */}
+            <div className="space-y-1">
+              <label className="font-label-md text-label-md text-gray-700 dark:text-gray-300 block font-semibold" htmlFor="role">
+                Account Type / Role
+              </label>
+              <div className="relative group">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline dark:text-gray-400">
+                  badge
+                </span>
+                <select
+                  className="w-full pl-10 pr-10 py-2.5 bg-surface dark:bg-slate-700 border border-outline-variant dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-body-md text-body-md text-gray-900 dark:text-white appearance-none cursor-pointer"
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  disabled={isLoading}
+                >
+                  <option value="student">Student (General User)</option>
+                  <option value="tutor">Tutor (Instructor)</option>
+                  <option value="admin">Administrator</option>
+                </select>
+                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none dark:text-gray-400">
+                  arrow_drop_down
+                </span>
               </div>
             </div>
 

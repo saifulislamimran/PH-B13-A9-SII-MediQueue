@@ -1,8 +1,9 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
-export default function PrivateRoute({ children }) {
+export default function PrivateRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -24,6 +25,14 @@ export default function PrivateRoute({ children }) {
 
   // If logged in, grant access to child content
   if (user) {
+    // Check if the user role is authorized to view this page
+    if (allowedRoles && !allowedRoles.includes(user.role || 'student')) {
+      // Schedule warning toast briefly after render to avoid React scheduling warning
+      setTimeout(() => {
+        toast.error('Access Denied: You do not have permission to access this dashboard.');
+      }, 50);
+      return <Navigate to="/" replace />;
+    }
     return children;
   }
 

@@ -46,7 +46,7 @@ function App() {
       <Route
         path="/add-tutor"
         element={
-          <PrivateRoute>
+          <PrivateRoute allowedRoles={['tutor', 'admin']}>
             <Layout>
               <AddTutor />
             </Layout>
@@ -66,7 +66,7 @@ function App() {
       <Route
         path="/admin"
         element={
-          <PrivateRoute>
+          <PrivateRoute allowedRoles={['admin']}>
             <Layout>
               <AdminDashboard />
             </Layout>

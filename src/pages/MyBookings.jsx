@@ -31,6 +31,9 @@ export default function MyBookings() {
 
   // Load user data on mount
   useEffect(() => {
+    if (user && user.role === 'student') {
+      setActiveTab('bookings');
+    }
     loadData();
   }, [user]);
 
@@ -168,13 +171,15 @@ export default function MyBookings() {
           </div>
           
           {/* Create Tutor Shortcut */}
-          <Link
-            to="/add-tutor"
-            className="px-5 py-3 bg-primary text-on-secondary rounded-xl font-label-md text-label-md hover:opacity-90 transition-all flex items-center gap-2"
-          >
-            <span className="material-symbols-outlined text-[18px]">add_circle</span>
-            List as a Tutor
-          </Link>
+          {user && (user.role === 'tutor' || user.role === 'admin') && (
+            <Link
+              to="/add-tutor"
+              className="px-5 py-3 bg-primary text-on-secondary rounded-xl font-label-md text-label-md hover:opacity-90 transition-all flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-[18px]">add_circle</span>
+              List as a Tutor
+            </Link>
+          )}
         </div>
 
         {/* Tab Selection Row */}
@@ -190,17 +195,19 @@ export default function MyBookings() {
             <span className="material-symbols-outlined text-[18px]">event_upcoming</span>
             My Booked Sessions ({bookings.length})
           </button>
-          <button
-            onClick={() => setActiveTab('tutors')}
-            className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
-              activeTab === 'tutors'
-                ? 'bg-primary text-on-secondary'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-surface-container-high dark:hover:bg-slate-800'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[18px]">school</span>
-            My Tutor Listings ({myTutors.length})
-          </button>
+          {user && (user.role === 'tutor' || user.role === 'admin') && (
+            <button
+              onClick={() => setActiveTab('tutors')}
+              className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
+                activeTab === 'tutors'
+                  ? 'bg-primary text-on-secondary'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-surface-container-high dark:hover:bg-slate-800'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">school</span>
+              My Tutor Listings ({myTutors.length})
+            </button>
+          )}
         </div>
 
         {/* Tab 1 Content: Bookings */}
@@ -309,7 +316,7 @@ export default function MyBookings() {
         )}
 
         {/* Tab 2 Content: Tutors */}
-        {activeTab === 'tutors' && (
+        {activeTab === 'tutors' && user && user.role !== 'student' && (
           <div>
             {myTutors.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

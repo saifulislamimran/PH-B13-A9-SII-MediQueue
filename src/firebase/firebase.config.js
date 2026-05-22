@@ -40,4 +40,6 @@ try {
   googleProvider = null;
 }
 
-export { auth, googleProvider };
+const isMockAuth = !auth || firebaseConfig.apiKey === "mock-api-key";
+
+export { auth, googleProvider, isMockAuth };
