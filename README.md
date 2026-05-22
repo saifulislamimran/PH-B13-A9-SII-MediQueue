@@ -1,5 +1,4 @@
-
-frontend_readme_content = """# MediQueue - Tutor Booking System (Frontend)
+# MediQueue - Tutor Booking System (Frontend)
 
 Greeting to the **Programming Hero** Team! This repository contains the Frontend Single-Page Application (SPA) for **MediQueue**, developed as part of Assignment 9. It is a highly optimized, feature-rich client application providing an elite UI/UX for students, tutors, and administrators.
 
