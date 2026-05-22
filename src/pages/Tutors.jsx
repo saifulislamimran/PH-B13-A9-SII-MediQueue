@@ -27,7 +27,7 @@ export default function Tutors() {
   // Filter and Sort Logic
   const filteredTutors = useMemo(() => {
     const customTutors = JSON.parse(localStorage.getItem('customTutors') || '[]');
-    let result = [...customTutors, ...mockTutors];
+    let result = [...customTutors, ...mockTutors].filter(t => t.status !== 'pending');
 
     // 1. Text Search query (matches name or subject tags)
     if (searchQuery.trim()) {

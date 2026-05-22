@@ -50,7 +50,8 @@ export default function AddTutor() {
         price: parseFloat(price),
         description: description.trim(),
         institution: institution.trim(),
-        isCustom: true // identify user-created items
+        isCustom: true, // identify user-created items
+        status: 'pending' // pending by default for admin approval
       };
 
       // Retrieve existing custom tutors
