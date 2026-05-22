@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,8 +8,9 @@ import { mockTutors } from '../data/mockTutors';
 
 export default function MyBookings() {
   useDocumentTitle('My Dashboard');
-  const { user, updateUserProfile, refreshUser } = useAuth();
+  const { user, updateUserProfile, updateUserPassword } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Dashboard Tabs: 'bookings', 'tutors', 'profile'
   const [activeTab, setActiveTab] = useState('bookings');
@@ -25,6 +26,16 @@ export default function MyBookings() {
   const [institution, setInstitution] = useState('');
   const [photoURL, setPhotoURL] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
+
+  // Drag & drop file states
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Password Change States
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
 
   // Profile Change Request Modal States
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
@@ -64,30 +75,15 @@ export default function MyBookings() {
 
   // Parse tab parameter from URL on mount and whenever search parameters change
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const tabParam = params.get('tab');
     if (tabParam) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTab(tabParam);
     }
-  }, [window.location.search]);
+  }, [location.search]);
 
-  // Load user profile details into states when user updates
-  useEffect(() => {
-    if (user) {
-      setAge(user.age || '');
-      setDesignation(user.designation || '');
-      setInstitution(user.institution || '');
-      setPhotoURL(user.photoURL || '');
-
-      setReqName(user.displayName || '');
-      setReqEmail(user.email || '');
-      setReqRole(user.role || 'student');
-      setReqId(user.studentTutorId || '');
-    }
-    loadData();
-  }, [user]);
-
-  const loadData = () => {
+  const loadData = useCallback(() => {
     if (!user) return;
 
     // Load bookings
@@ -104,7 +100,24 @@ export default function MyBookings() {
     const apps = JSON.parse(localStorage.getItem('tutor_applications') || '[]');
     const userApp = apps.find(a => a.userEmail === user.email && a.status === 'pending');
     setPendingTutorApp(userApp || null);
-  };
+  }, [user]);
+
+  // Load user profile details into states when user updates
+  useEffect(() => {
+    if (user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAge(user.age || '');
+      setDesignation(user.designation || '');
+      setInstitution(user.institution || '');
+      setPhotoURL(user.photoURL || '');
+
+      setReqName(user.displayName || '');
+      setReqEmail(user.email || '');
+      setReqRole(user.role || 'student');
+      setReqId(user.studentTutorId || '');
+    }
+    loadData();
+  }, [user, loadData]);
 
   // Cancel Booking Action
   const handleCancelBooking = (bookingId, tutorName) => {
@@ -224,6 +237,80 @@ export default function MyBookings() {
     }
   };
 
+  const processFile = (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please upload an image file.");
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      toast.error("File size exceeds 1MB limit. Please upload a smaller image.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPhotoURL(e.target.result);
+      toast.success("Image uploaded successfully!");
+    };
+    reader.onerror = () => {
+      toast.error("Error reading file.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      processFile(e.target.files[0]);
+    }
+  };
+
+  // Password validation checks
+  const isLengthValid = newPassword.length >= 6;
+  const hasUppercase = /[A-Z]/.test(newPassword);
+  const hasLowercase = /[a-z]/.test(newPassword);
+  const isMatch = newPassword === confirmPassword && confirmPassword !== '';
+
+  const isPasswordFormValid = isLengthValid && hasUppercase && hasLowercase && isMatch && currentPassword !== '';
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (!isPasswordFormValid) {
+      toast.error("Please satisfy all password validation requirements.");
+      return;
+    }
+    setUpdatingPassword(true);
+    try {
+      await updateUserPassword(currentPassword, newPassword);
+      toast.success("Password updated successfully!");
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to update password. Make sure current password is correct.");
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
+
   // Submit Profile Change Request (Identity fields)
   const handleRequestChangeSubmit = (e) => {
     e.preventDefault();
@@ -327,6 +414,7 @@ export default function MyBookings() {
       localStorage.setItem('customTutors', JSON.stringify(updated));
       loadData();
     } catch (err) {
+      console.error(err);
       toast.error('Failed to toggle availability.');
     }
   };
@@ -364,6 +452,7 @@ export default function MyBookings() {
       setEditingTutor(null);
       loadData();
     } catch (err) {
+      console.error(err);
       toast.error('Failed to update listing details.');
     }
   };
@@ -382,6 +471,7 @@ export default function MyBookings() {
       toast.success(`Successfully switched to ${target.toUpperCase()} Plan!`);
       loadData();
     } catch (err) {
+      console.error(err);
       toast.error('Failed to update plan status.');
     }
   };
@@ -908,19 +998,80 @@ export default function MyBookings() {
                     />
                   </div>
 
-                  {/* Photo URL Input */}
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block" htmlFor="prof-photo">
-                      Photo URL
+                  {/* Photo Upload Zone */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block">
+                      Profile Picture
                     </label>
-                    <input
-                      id="prof-photo"
-                      type="url"
-                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm text-gray-900 dark:text-white"
-                      placeholder="https://example.com/photo.jpg"
-                      value={photoURL}
-                      onChange={(e) => setPhotoURL(e.target.value)}
-                    />
+                    
+                    <div
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`relative border-2 border-dashed rounded-2xl p-6 transition-all cursor-pointer flex flex-col items-center justify-center text-center ${
+                        isDragging
+                          ? 'border-primary bg-primary/5 dark:bg-primary/10'
+                          : 'border-outline-variant/40 hover:border-primary/50 bg-gray-50/50 dark:bg-slate-800/40'
+                      }`}
+                    >
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                      
+                      {photoURL ? (
+                        <div className="space-y-3 flex flex-col items-center">
+                          <div className="relative group w-20 h-20 rounded-full overflow-hidden border border-outline-variant/30 shadow-md">
+                            <img
+                              src={photoURL}
+                              alt="Profile Preview"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.src = "https://lh3.googleusercontent.com/aida-public/AB6AXuCYGCzxWEJXxLkhf1ZYrj5iCh84lmUnuFIDoSiXPS9tqi0XSMFy4oxYx1xn2Xop9PmlOVqx4jt1JhIvBG3DiLzxIDtLLTADZTwB52L5pf5c316c1oOwwf8-LkKBCy_34v7Y7tYh1iOIE2XRVRcHmPQjOQcUe11o9LgOG_mqHWECPS3OaU6VUtzx2-COQ0AScUHCWmKa4gA4op6XAFa8Djiid3j6uw3jGOhed6HAhV8JyCKEidkTKoR7rw8DnYf844tpEPK98Sm2lQk";
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="material-symbols-outlined text-white text-lg">edit</span>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs font-bold text-gray-900 dark:text-white">Image selected</p>
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400">Drag/drop or click to replace</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <span className="material-symbols-outlined text-primary text-4xl">cloud_upload</span>
+                          <div className="space-y-1">
+                            <p className="text-xs font-bold text-gray-900 dark:text-white">
+                              Drag & drop profile picture here
+                            </p>
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                              or click to browse from device (Max 1MB)
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Photo URL fallback input */}
+                    <div className="pt-2">
+                      <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 block mb-1">
+                        Or paste image URL instead
+                      </label>
+                      <input
+                        id="prof-photo"
+                        type="url"
+                        className="w-full px-4 py-2 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-xs text-gray-900 dark:text-white"
+                        placeholder="https://example.com/photo.jpg"
+                        value={photoURL}
+                        onChange={(e) => setPhotoURL(e.target.value)}
+                      />
+                    </div>
                   </div>
 
                   <div className="flex justify-end pt-2">
@@ -935,6 +1086,123 @@ export default function MyBookings() {
                         <span className="material-symbols-outlined text-[16px]">save</span>
                       )}
                       Save Profile Settings
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Password Change Card */}
+              <div className="bg-white dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">lock_reset</span>
+                  Change Password
+                </h3>
+
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                  {/* Current Password */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block" htmlFor="current-pwd">
+                      Current Password
+                    </label>
+                    <input
+                      id="current-pwd"
+                      type="password"
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm text-gray-900 dark:text-white"
+                      placeholder="Enter current password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {/* New Password */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block" htmlFor="new-pwd">
+                      New Password
+                    </label>
+                    <input
+                      id="new-pwd"
+                      type="password"
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm text-gray-900 dark:text-white"
+                      placeholder="Enter new password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {/* Confirm Password */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block" htmlFor="confirm-pwd">
+                      Confirm New Password
+                    </label>
+                    <input
+                      id="confirm-pwd"
+                      type="password"
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm text-gray-900 dark:text-white"
+                      placeholder="Confirm new password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {/* Live Validation Badges */}
+                  <div className="pt-2 space-y-2 bg-gray-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-outline-variant/10">
+                    <p className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Password Requirements:</p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className={`material-symbols-outlined text-[16px] ${isLengthValid ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {isLengthValid ? 'check_circle' : 'cancel'}
+                        </span>
+                        <span className={isLengthValid ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-700 dark:text-gray-300'}>
+                          At least 6 characters
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className={`material-symbols-outlined text-[16px] ${hasUppercase ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {hasUppercase ? 'check_circle' : 'cancel'}
+                        </span>
+                        <span className={hasUppercase ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-700 dark:text-gray-300'}>
+                          One uppercase letter
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className={`material-symbols-outlined text-[16px] ${hasLowercase ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {hasLowercase ? 'check_circle' : 'cancel'}
+                        </span>
+                        <span className={hasLowercase ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-700 dark:text-gray-300'}>
+                          One lowercase letter
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className={`material-symbols-outlined text-[16px] ${isMatch ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {isMatch ? 'check_circle' : 'cancel'}
+                        </span>
+                        <span className={isMatch ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-700 dark:text-gray-300'}>
+                          Passwords match
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      disabled={updatingPassword || !isPasswordFormValid}
+                      className="px-6 py-3 bg-primary text-on-secondary rounded-xl text-xs font-bold hover:opacity-95 transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {updatingPassword ? (
+                        <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                      ) : (
+                        <span className="material-symbols-outlined text-[16px]">vpn_key</span>
+                      )}
+                      Update Password
                     </button>
                   </div>
                 </form>

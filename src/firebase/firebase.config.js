@@ -2,18 +2,25 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const getEnv = (key) => {
-  if (typeof process !== "undefined" && process.env) {
-    if (process.env[key]) return process.env[key];
-    if (process.env[`NEXT_PUBLIC_${key}`]) return process.env[`NEXT_PUBLIC_${key}`];
-    if (process.env[`VITE_${key}`]) return process.env[`VITE_${key}`];
-  }
   try {
-    if (typeof import.meta !== "undefined" && import.meta.env) {
-      if (import.meta.env[key]) return import.meta.env[key];
-      if (import.meta.env[`NEXT_PUBLIC_${key}`]) return import.meta.env[`NEXT_PUBLIC_${key}`];
-      if (import.meta.env[`VITE_${key}`]) return import.meta.env[`VITE_${key}`];
+    const metaEnv = import.meta.env;
+    if (metaEnv) {
+      if (metaEnv[key]) return metaEnv[key];
+      if (metaEnv[`NEXT_PUBLIC_${key}`]) return metaEnv[`NEXT_PUBLIC_${key}`];
+      if (metaEnv[`VITE_${key}`]) return metaEnv[`VITE_${key}`];
     }
-  } catch (err) {}
+  } catch {
+    // Ignore metaEnv check if not supported
+  }
+
+  const globalEnv = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : {};
+  const proc = globalEnv.process;
+  if (proc && proc.env) {
+    if (proc.env[key]) return proc.env[key];
+    if (proc.env[`NEXT_PUBLIC_${key}`]) return proc.env[`NEXT_PUBLIC_${key}`];
+    if (proc.env[`VITE_${key}`]) return proc.env[`VITE_${key}`];
+  }
+
   return undefined;
 };
 

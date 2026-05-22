@@ -4,7 +4,7 @@ import { getStoredToken, removeStoredToken } from '../utils/token';
 // Create a configured Axios instance
 const axiosInstance = axios.create({
   baseURL: 
-    (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_API_URL) || 
+    (typeof globalThis !== 'undefined' && globalThis.process?.env?.NEXT_PUBLIC_API_URL) || 
     import.meta.env.VITE_API_URL || 
     'https://mediqueue-server.vercel.app/api',
   timeout: 10000,

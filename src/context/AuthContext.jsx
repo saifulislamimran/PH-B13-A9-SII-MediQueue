@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useEffect, useState } from 'react';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -21,7 +22,7 @@ export function AuthProvider({ children }) {
     try {
       const db = localStorage.getItem("mock_users_db");
       return db ? JSON.parse(db) : [];
-    } catch (e) {
+    } catch {
       return [];
     }
   };
@@ -221,6 +222,34 @@ export function AuthProvider({ children }) {
     });
   };
 
+  // Change Password
+  const updateUserPassword = (currentPassword, newPassword) => {
+    if (isMockAuth) {
+      const db = getMockUsersDB();
+      const userIndex = db.findIndex(u => u.uid === user?.uid);
+      if (userIndex === -1) {
+        return Promise.reject(new Error("User not found in mock database."));
+      }
+      if (db[userIndex].password !== currentPassword) {
+        return Promise.reject(new Error("Current password does not match."));
+      }
+      db[userIndex].password = newPassword;
+      saveMockUsersDB(db);
+      
+      const updatedUser = { ...user, password: newPassword };
+      setUser(updatedUser);
+      localStorage.setItem("mock_user", JSON.stringify(updatedUser));
+      return Promise.resolve();
+    } else {
+      if (!auth.currentUser) {
+        return Promise.reject(new Error("No active user session found."));
+      }
+      return import('firebase/auth').then(({ updatePassword }) => {
+        return updatePassword(auth.currentUser, newPassword);
+      });
+    }
+  };
+
   // Synchronize/refresh user state from localStorage
   const refreshUser = () => {
     if (isMockAuth) {
@@ -311,6 +340,7 @@ export function AuthProvider({ children }) {
           studentTutorId: savedProfile.studentTutorId || `MQ-${latestUser.uid ? latestUser.uid.substring(0, 6).toUpperCase() : 'TEST'}`,
           subscriptionStatus: savedProfile.subscriptionStatus || 'free'
         };
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUser(merged);
         localStorage.setItem("mock_user", JSON.stringify(merged));
         setStoredToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mockToken");
@@ -362,7 +392,8 @@ export function AuthProvider({ children }) {
     loginWithGoogle,
     logoutUser,
     updateUserProfile,
-    refreshUser
+    refreshUser,
+    updateUserPassword
   };
 
   return (

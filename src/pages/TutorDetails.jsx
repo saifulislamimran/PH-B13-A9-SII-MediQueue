@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { mockTutors } from '../data/mockTutors';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+
+const generateBookingId = () => `book-${Date.now()}`;
+const generateTxId = () => `tx-${Math.floor(1000 + Math.random() * 9000)}`;
 
 export default function TutorDetails() {
   const { id } = useParams();
@@ -66,7 +69,7 @@ export default function TutorDetails() {
 
       // Create new booking record structure
       const newBooking = {
-        bookingId: `book-${Date.now()}`,
+        bookingId: generateBookingId(),
         tutorId: tutor.id,
         tutorName: tutor.name,
         tutorImage: tutor.image,
@@ -86,6 +89,31 @@ export default function TutorDetails() {
       const existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
       existingBookings.push(newBooking);
       localStorage.setItem('bookings', JSON.stringify(existingBookings));
+
+      // Auto-log transaction in financials ledger
+      const existingLedger = localStorage.getItem('admin_financial_ledger');
+      let ledgerArray = [];
+      if (!existingLedger) {
+        ledgerArray = [
+          { id: 'tx-1001', type: 'inflow', description: 'Student Booking: Emma Watson (Anatomy)', amount: 85, date: '2026-05-18', status: 'Completed' },
+          { id: 'tx-1002', type: 'inflow', description: 'Student Booking: Lucas Miller (Cardiology)', amount: 65, date: '2026-05-19', status: 'Completed' },
+          { id: 'tx-1003', type: 'outflow', description: 'Tutor Payout: Dr. Sarah Johnson', amount: 170, date: '2026-05-20', status: 'Completed' },
+          { id: 'tx-1004', type: 'inflow', description: 'Student Booking: Sophia Chen (Neurology)', amount: 95, date: '2026-05-21', status: 'Completed' },
+          { id: 'tx-1005', type: 'outflow', description: 'Tutor Payout: Alex Rivera', amount: 130, date: '2026-05-21', status: 'Pending' }
+        ];
+      } else {
+        ledgerArray = JSON.parse(existingLedger);
+      }
+      const newTx = {
+        id: generateTxId(),
+        type: 'inflow',
+        description: `Student Booking: ${user.displayName || 'Student'} (${selectedSubject})`,
+        amount: tutor.price,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Completed'
+      };
+      ledgerArray.push(newTx);
+      localStorage.setItem('admin_financial_ledger', JSON.stringify(ledgerArray));
 
       // Mock delay
       setTimeout(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { mockTutors } from '../data/mockTutors';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import toast from 'react-hot-toast';
@@ -33,6 +33,8 @@ export default function AdminDashboard() {
   // Interactive Charts hover states
   const [hoveredRevenueIndex, setHoveredRevenueIndex] = useState(null);
   const [hoveredBookingIndex, setHoveredBookingIndex] = useState(null);
+  const [hoveredSpecialtyIndex, setHoveredSpecialtyIndex] = useState(null);
+  const [hoveredDonutSegment, setHoveredDonutSegment] = useState(null);
 
   // Form Modals states
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
@@ -73,6 +75,8 @@ export default function AdminDashboard() {
   const [scheduleTime, setScheduleTime] = useState('10:00 AM - 11:00 AM');
   const [performance, setPerformance] = useState('Good (85%)');
   const [taskStatus, setTaskStatus] = useState('In Progress');
+  const [studentGeneratedId, setStudentGeneratedId] = useState('');
+  const [studentGeneratedPassword, setStudentGeneratedPassword] = useState('');
 
   // Student Search and Filter States
   const [studentSearch, setStudentSearch] = useState('');
@@ -86,6 +90,87 @@ export default function AdminDashboard() {
   const [txAmount, setTxAmount] = useState('');
   const [txStatus, setTxStatus] = useState('Completed');
   const [txDate, setTxDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Ledger Filter and Combobox States
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'daily', 'weekly', 'monthly'
+  const [isComboOpen, setIsComboOpen] = useState(false);
+
+  // Filtered ledger entries based on timeline selection
+  const filteredLedger = useMemo(() => {
+    const todayStr = '2026-05-22';
+    const today = new Date(todayStr);
+
+    return ledger.filter(tx => {
+      if (timeFilter === 'all') return true;
+
+      const txDate = new Date(tx.date);
+      if (isNaN(txDate.getTime())) return true;
+
+      const diffTime = today.getTime() - txDate.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (timeFilter === 'daily') {
+        return tx.date === todayStr;
+      }
+      if (timeFilter === 'weekly') {
+        return diffDays >= 0 && diffDays < 7;
+      }
+      if (timeFilter === 'monthly') {
+        return tx.date.startsWith('2026-05');
+      }
+      return true;
+    });
+  }, [ledger, timeFilter]);
+
+  const filteredInflowTotal = useMemo(() => {
+    return filteredLedger
+      .filter(tx => tx.type === 'inflow' && tx.status === 'Completed')
+      .reduce((sum, tx) => sum + tx.amount, 0);
+  }, [filteredLedger]);
+
+  const filteredOutflowTotal = useMemo(() => {
+    return filteredLedger
+      .filter(tx => tx.type === 'outflow' && tx.status === 'Completed')
+      .reduce((sum, tx) => sum + tx.amount, 0);
+  }, [filteredLedger]);
+
+  const filteredNetProfit = useMemo(() => {
+    return filteredInflowTotal - filteredOutflowTotal;
+  }, [filteredInflowTotal, filteredOutflowTotal]);
+
+  // Combobox list suggestions derived from Students/Tutors CRM data
+  const comboboxSuggestions = useMemo(() => {
+    if (txType === 'inflow') {
+      return students.map(s => {
+        const specialty = s.performance.includes('Anatomy') || s.assignedTutor.includes('Sarah') ? 'Anatomy' : 
+                          s.assignedTutor.includes('Rivera') ? 'Cardiology' :
+                          s.assignedTutor.includes('Chen') ? 'Neurology' : 'OSCE';
+        return {
+          title: s.name,
+          subtitle: `Student Fee - Assigned: ${s.assignedTutor} (${specialty})`,
+          value: `Student Booking: ${s.name} (${specialty})`
+        };
+      });
+    } else {
+      return tutors.map(t => {
+        const specialty = t.subjects?.[0] || 'Medical Prep';
+        return {
+          title: t.name,
+          subtitle: `Tutor Payout - Specialty: ${specialty}`,
+          value: `Tutor Payout: ${t.name}`
+        };
+      });
+    }
+  }, [txType, students, tutors]);
+
+  const filteredComboSuggestions = useMemo(() => {
+    if (!txDesc) return comboboxSuggestions;
+    const search = txDesc.toLowerCase();
+    return comboboxSuggestions.filter(item =>
+      item.title.toLowerCase().includes(search) ||
+      item.value.toLowerCase().includes(search)
+    );
+  }, [comboboxSuggestions, txDesc]);
 
   // Load and sync CRM data from localStorage
   const loadAllData = () => {
@@ -357,6 +442,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadAllData();
   }, []);
 
@@ -432,6 +518,69 @@ export default function AdminDashboard() {
       cancelledRatio
     };
   }, [tutors, students, ledger, tutorApplications, changeRequests, bookings]);
+
+  // Specialty Breakdown share data for Donut Chart (Teacher vs Student Tracking)
+  const specialtyShareData = useMemo(() => {
+    // Collect all unique subjects
+    const uniqueSubjects = new Set();
+    tutors.forEach(t => {
+      t.subjects?.forEach(sub => uniqueSubjects.add(sub));
+    });
+    bookings.forEach(b => {
+      if (b.subject) uniqueSubjects.add(b.subject);
+    });
+
+    const data = Array.from(uniqueSubjects).map(subject => {
+      const teacherCount = tutors.filter(t => t.subjects?.includes(subject) && (t.status || 'approved') === 'approved').length;
+      const studentCount = bookings.filter(b => b.subject === subject).length;
+      const totalCount = teacherCount + studentCount;
+
+      return {
+        subject,
+        teacherCount,
+        studentCount,
+        totalCount
+      };
+    });
+
+    // Sort descending by totalCount
+    return data.sort((a, b) => b.totalCount - a.totalCount);
+  }, [tutors, bookings]);
+
+  // Donut chart segment values calculated dynamically
+  const activeDonutCounts = useMemo(() => {
+    let tCount = 0;
+    let sCount = 0;
+    let title = "Overall Ratio";
+    let isSpecific = false;
+
+    if (hoveredSpecialtyIndex !== null && specialtyShareData[hoveredSpecialtyIndex]) {
+      const active = specialtyShareData[hoveredSpecialtyIndex];
+      tCount = active.teacherCount;
+      sCount = active.studentCount;
+      title = active.subject;
+      isSpecific = true;
+    } else {
+      specialtyShareData.forEach(item => {
+        tCount += item.teacherCount;
+        sCount += item.studentCount;
+      });
+    }
+
+    const total = tCount + sCount;
+    const tPct = total > 0 ? (tCount / total) * 100 : 0;
+    const sPct = total > 0 ? (sCount / total) * 100 : 0;
+
+    return {
+      tCount,
+      sCount,
+      total,
+      tPct,
+      sPct,
+      title,
+      isSpecific
+    };
+  }, [hoveredSpecialtyIndex, specialtyShareData]);
 
   // Coordinates and data calculations for charts
   const monthlyRevenue = useMemo(() => {
@@ -566,6 +715,15 @@ export default function AdminDashboard() {
     const password = `MQ-Temp-${randomStr}-${randomNum}!`;
     setTutorGeneratedUserId(userId);
     setTutorGeneratedPassword(password);
+  };
+
+  const generateStudentTempCredentials = () => {
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const userId = `MQ-STU-${randomNum}`;
+    const password = `MQ-Temp-${randomStr}-${randomNum}!`;
+    setStudentGeneratedId(userId);
+    setStudentGeneratedPassword(password);
   };
 
   const toggleTutorSubject = (sub) => {
@@ -719,28 +877,113 @@ export default function AdminDashboard() {
       return;
     }
 
-    const newStudent = {
-      id: `student-${Date.now()}`,
-      name: studentName.trim(),
-      email: studentEmail.trim(),
-      assignedTutor: assignedTutor || (approvedTutors[0]?.name || 'N/A'),
-      scheduleDate: scheduleDate || new Date().toISOString().split('T')[0],
-      scheduleTime,
-      performance,
-      taskStatus,
-      joinDate: new Date().toISOString().split('T')[0]
-    };
+    if (!studentGeneratedId || !studentGeneratedPassword) {
+      toast.error('Student temporary credentials are not generated.');
+      return;
+    }
 
-    const updated = [...students, newStudent];
-    localStorage.setItem('admin_students', JSON.stringify(updated));
-    setStudents(updated);
-    setIsAddStudentOpen(false);
-    
-    // Reset Form fields
-    setStudentName('');
-    setStudentEmail('');
-    setScheduleDate('');
-    toast.success(`Student ${newStudent.name} added manually.`);
+    try {
+      const targetUid = `mock-uid-${Date.now()}`;
+      
+      // 1. Create registration user in mock_users_db
+      const db = JSON.parse(localStorage.getItem("mock_users_db") || "[]");
+      
+      // Avoid duplicate emails
+      if (db.some(u => u.email.toLowerCase() === studentEmail.trim().toLowerCase())) {
+        toast.error('A user with this email already exists.');
+        return;
+      }
+
+      const newUser = {
+        uid: targetUid,
+        email: studentEmail.trim(),
+        password: studentGeneratedPassword,
+        displayName: studentName.trim(),
+        photoURL: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCYGCzxWEJXxLkhf1ZYrj5iCh84lmUnuFIDoSiXPS9tqi0XSMFy4oxYx1xn2Xop9PmlOVqx4jt1JhIvBG3DiLzxIDtLLTADZTwB52L5pf5c316c1oOwwf8-LkKBCy_34v7Y7tYh1iOIE2XRVRcHmPQjOQcUe11o9LgOG_mqHWECPS3OaU6VUtzx2-COQ0AScUHCWmKa4gA4op6XAFa8Djiid3j6uw3jGOhed6HAhV8JyCKEidkTKoR7rw8DnYf844tpEPK98Sm2lQk',
+        role: 'student'
+      };
+
+      db.push(newUser);
+      localStorage.setItem("mock_users_db", JSON.stringify(db));
+
+      // 2. Set roles in localStorage
+      localStorage.setItem(`role_${targetUid}`, 'student');
+      localStorage.setItem(`role_${studentEmail.trim()}`, 'student');
+
+      // 3. Set profile details in localStorage
+      const studentProfile = {
+        studentTutorId: studentGeneratedId,
+        institution: 'Harvard Medical School',
+        designation: 'Med Student',
+        subscriptionStatus: 'free',
+        age: 21
+      };
+      localStorage.setItem(`profile_${targetUid}`, JSON.stringify(studentProfile));
+      localStorage.setItem(`profile_${studentEmail.trim()}`, JSON.stringify(studentProfile));
+
+      // 4. Determine Assigned Tutor details
+      const selectedTutorName = assignedTutor || (approvedTutors[0]?.name || 'N/A');
+      const selectedTutor = approvedTutors.find(t => t.name === selectedTutorName);
+
+      // 5. Handle booking if scheduleDate is specified
+      if (scheduleDate) {
+        const newBooking = {
+          bookingId: `book-${Date.now()}`,
+          tutorId: selectedTutor ? selectedTutor.id : 'tutor-1',
+          tutorName: selectedTutorName,
+          tutorImage: selectedTutor ? selectedTutor.image : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCYGCzxWEJXxLkhf1ZYrj5iCh84lmUnuFIDoSiXPS9tqi0XSMFy4oxYx1xn2Xop9PmlOVqx4jt1JhIvBG3DiLzxIDtLLTADZTwB52L5pf5c316c1oOwwf8-LkKBCy_34v7Y7tYh1iOIE2XRVRcHmPQjOQcUe11o9LgOG_mqHWECPS3OaU6VUtzx2-COQ0AScUHCWmKa4gA4op6XAFa8Djiid3j6uw3jGOhed6HAhV8JyCKEidkTKoR7rw8DnYf844tpEPK98Sm2lQk',
+          tutorInstitution: selectedTutor ? (selectedTutor.institution || 'Harvard Medical School') : 'Harvard Medical School',
+          price: selectedTutor ? (selectedTutor.price || 75) : 75,
+          studentName: studentName.trim(),
+          studentEmail: studentEmail.trim(),
+          appointmentDate: scheduleDate,
+          appointmentTime: scheduleTime,
+          subject: selectedTutor ? (selectedTutor.subjects?.[0] || 'Anatomy') : 'Anatomy',
+          note: 'Manually added student session.',
+          bookedAt: new Date().toISOString(),
+          status: taskStatus === 'Completed' ? 'Completed' : (taskStatus === 'Overdue' ? 'Completed' : 'Scheduled')
+        };
+        
+        const currentBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+        currentBookings.push(newBooking);
+        localStorage.setItem('bookings', JSON.stringify(currentBookings));
+        setBookings(currentBookings);
+      }
+
+      // 6. Update Active Student CRM listing
+      const newStudentListing = {
+        id: `student-${Date.now()}`,
+        name: studentName.trim(),
+        email: studentEmail.trim(),
+        assignedTutor: selectedTutorName,
+        scheduleDate: scheduleDate || new Date().toISOString().split('T')[0],
+        scheduleTime,
+        performance,
+        taskStatus,
+        joinDate: new Date().toISOString().split('T')[0]
+      };
+
+      const updatedStudents = [...students, newStudentListing];
+      localStorage.setItem('admin_students', JSON.stringify(updatedStudents));
+      setStudents(updatedStudents);
+
+      setIsAddStudentOpen(false);
+      
+      // Reset Form fields
+      setStudentName('');
+      setStudentEmail('');
+      setScheduleDate('');
+      setStudentGeneratedId('');
+      setStudentGeneratedPassword('');
+      toast.success(`Student ${newUser.displayName} added manually & registered.`);
+
+      // Refresh data
+      loadAllData();
+
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to create student account. Please try again.');
+    }
   };
 
   const handleBanStudent = (studentId, name) => {
@@ -825,6 +1068,139 @@ export default function AdminDashboard() {
     setTxDesc('');
     setTxAmount('');
     toast.success('Transaction recorded in ledger.');
+  };
+
+  // Mock Receipt Download Generator utilizing HTML5 Canvas
+  const downloadMockReceipt = (tx) => {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 600;
+      canvas.height = 800;
+      const ctx = canvas.getContext('2d');
+
+      ctx.imageSmoothingEnabled = true;
+
+      // Background Gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, 800);
+      bgGrad.addColorStop(0, '#f8fafc');
+      bgGrad.addColorStop(1, '#f1f5f9');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 600, 800);
+
+      // Decorative Header Band
+      ctx.fillStyle = '#24389c';
+      ctx.fillRect(0, 0, 600, 120);
+
+      // Header Content
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('MediQueue Operations Portal', 40, 55);
+      ctx.font = '500 13px sans-serif';
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText('Official Financial Transaction Receipt', 40, 80);
+
+      // Date/Time Stamp (Receipt info right header)
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px monospace';
+      ctx.fillText(`ID: ${tx.id}`, 560, 52);
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText(`Issued: ${tx.date}`, 560, 80);
+      ctx.textAlign = 'left'; // Reset
+
+      // Main Card container
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(40, 160, 520, 480, 16);
+      } else {
+        ctx.rect(40, 160, 520, 480);
+      }
+      ctx.fill();
+
+      // Receipt details text
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText('Transaction Summary', 70, 210);
+
+      // Divider Line
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(70, 230);
+      ctx.lineTo(530, 230);
+      ctx.stroke();
+
+      const drawRow = (label, value, y, isBold = false) => {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '500 13px sans-serif';
+        ctx.fillText(label, 70, y);
+        
+        ctx.fillStyle = '#0f172a';
+        ctx.font = isBold ? 'bold 14px sans-serif' : '500 13px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(value, 530, y);
+        ctx.textAlign = 'left';
+      };
+
+      drawRow('Transaction Type:', tx.type === 'inflow' ? 'Student Fees (Inflow)' : 'Tutor Payout (Outflow)', 270, true);
+      drawRow('Posting Date:', tx.date, 310);
+      drawRow('Description:', tx.description, 350);
+      drawRow('Payment Status:', tx.status, 390);
+
+      // Divider Line
+      ctx.beginPath();
+      ctx.moveTo(70, 430);
+      ctx.lineTo(530, 430);
+      ctx.stroke();
+
+      // Large Amount box
+      ctx.fillStyle = tx.type === 'inflow' ? '#ecfdf5' : '#fef2f2';
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(70, 460, 460, 100, 12);
+      } else {
+        ctx.rect(70, 460, 460, 100);
+      }
+      ctx.fill();
+
+      ctx.fillStyle = tx.type === 'inflow' ? '#065f46' : '#991b1b';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(tx.type === 'inflow' ? 'TOTAL INFLOW CHARGED' : 'TOTAL OUTFLOW DISBURSED', 90, 495);
+
+      ctx.font = 'bold 32px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(`${tx.type === 'inflow' ? '+' : '-'}$${parseFloat(tx.amount).toFixed(2)}`, 510, 525);
+      ctx.textAlign = 'left';
+
+      // Subtitle footer inside card
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'italic 11px sans-serif';
+      ctx.fillText('This is a computer generated mock document from the MediQueue sandbox environment.', 70, 610);
+
+      // Footer section
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 12px sans-serif';
+      ctx.fillText('MediQueue Inc. • Client-Side Ledger Record', 300, 710);
+      ctx.font = '10px monospace';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`HASH-MD5: ${btoa(tx.id + tx.amount + tx.date).slice(0, 16)}`, 300, 730);
+
+      // Trigger download
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `receipt-${tx.id}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success(`Receipt for ${tx.id} downloaded successfully!`);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate receipt image.');
+    }
   };
 
   // Actions: Profile Change Request Approval
@@ -1413,30 +1789,207 @@ export default function AdminDashboard() {
             {/* Detailed Distribution */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Specialty coverage */}
-              <div className="lg:col-span-2 bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 md:p-8 shadow-sm">
+              <div className="lg:col-span-2 bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">pie_chart</span>
                   Specialty Coverage Share
                 </h2>
-                <div className="space-y-4">
-                  {Object.entries(stats.subjectDistribution).map(([subject, count]) => {
-                    const percentage = stats.totalTutors > 0 ? ((count / stats.totalTutors) * 100).toFixed(0) : 0;
-                    return (
-                      <div key={subject} className="space-y-1">
-                        <div className="flex justify-between items-center text-xs font-bold">
-                          <span className="text-gray-700 dark:text-gray-200">{subject}</span>
-                          <span className="text-primary dark:text-primary-fixed-dim">{count} Tutors ({percentage}%)</span>
+                
+                {specialtyShareData.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center text-gray-505 dark:text-gray-400">
+                    <span className="material-symbols-outlined text-4xl mb-2 text-gray-300">sentiment_dissatisfied</span>
+                    <p className="font-extrabold text-sm">No tutor specialty data available.</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-8 md:gap-12 flex-1">
+                    {/* Donut Chart Canvas */}
+                    <div className="relative w-48 h-48 flex-shrink-0">
+                      <svg className="w-full h-full" viewBox="0 0 180 180">
+                        {/* Gray background track */}
+                        <circle
+                          cx="90"
+                          cy="90"
+                          r="60"
+                          fill="transparent"
+                          className="stroke-gray-100 dark:stroke-slate-700"
+                          strokeWidth="14"
+                        />
+                        
+                        {/* Segment circles */}
+                        {activeDonutCounts.total > 0 ? (
+                          <>
+                            {/* Segment 1: Teachers */}
+                            <circle
+                              cx="90"
+                              cy="90"
+                              r="60"
+                              fill="transparent"
+                              stroke="#6366f1"
+                              strokeWidth={hoveredDonutSegment === 'teachers' ? 20 : 14}
+                              strokeDasharray={`${(activeDonutCounts.tPct / 100) * 2 * Math.PI * 60} ${2 * Math.PI * 60}`}
+                              strokeDashoffset={2 * Math.PI * 60}
+                              transform="rotate(-90 90 90)"
+                              className="transition-all duration-300 ease-out cursor-pointer origin-center"
+                              onMouseEnter={() => setHoveredDonutSegment('teachers')}
+                              onMouseLeave={() => setHoveredDonutSegment(null)}
+                              style={{
+                                filter: hoveredDonutSegment === 'teachers' ? `drop-shadow(0 0 4px #6366f180)` : 'none',
+                                opacity: hoveredDonutSegment === 'students' ? 0.35 : 1
+                              }}
+                            />
+                            {/* Segment 2: Students */}
+                            <circle
+                              cx="90"
+                              cy="90"
+                              r="60"
+                              fill="transparent"
+                              stroke="#10b981"
+                              strokeWidth={hoveredDonutSegment === 'students' ? 20 : 14}
+                              strokeDasharray={`${(activeDonutCounts.sPct / 100) * 2 * Math.PI * 60} ${2 * Math.PI * 60}`}
+                              strokeDashoffset={(2 * Math.PI * 60) - (activeDonutCounts.tPct / 100) * 2 * Math.PI * 60}
+                              transform="rotate(-90 90 90)"
+                              className="transition-all duration-300 ease-out cursor-pointer origin-center"
+                              onMouseEnter={() => setHoveredDonutSegment('students')}
+                              onMouseLeave={() => setHoveredDonutSegment(null)}
+                              style={{
+                                filter: hoveredDonutSegment === 'students' ? `drop-shadow(0 0 4px #10b98180)` : 'none',
+                                opacity: hoveredDonutSegment === 'teachers' ? 0.35 : 1
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <circle
+                            cx="90"
+                            cy="90"
+                            r="60"
+                            fill="transparent"
+                            className="stroke-gray-250 dark:stroke-slate-805"
+                            strokeWidth="14"
+                          />
+                        )}
+                      </svg>
+                      
+                      {/* Dynamic statistic panel inside the donut hole */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center px-4">
+                        {hoveredDonutSegment === 'teachers' ? (
+                          <>
+                            <span className="text-[9px] uppercase tracking-wider font-extrabold text-indigo-400 dark:text-indigo-400/80">
+                              Teachers Total
+                            </span>
+                            <span className="text-2xl font-extrabold text-gray-900 dark:text-white leading-tight">
+                              {specialtyShareData.reduce((sum, item) => sum + item.teacherCount, 0)}
+                            </span>
+                            <span className="text-[9px] font-bold text-gray-500 dark:text-gray-405">
+                              Discipline Slots
+                            </span>
+                          </>
+                        ) : hoveredDonutSegment === 'students' ? (
+                          <>
+                            <span className="text-[9px] uppercase tracking-wider font-extrabold text-emerald-400 dark:text-emerald-400/80">
+                              Students Total
+                            </span>
+                            <span className="text-2xl font-extrabold text-gray-900 dark:text-white leading-tight">
+                              {specialtyShareData.reduce((sum, item) => sum + item.studentCount, 0)}
+                            </span>
+                            <span className="text-[9px] font-bold text-gray-500 dark:text-gray-405">
+                              Bookings Count
+                            </span>
+                          </>
+                        ) : activeDonutCounts.isSpecific ? (
+                          <>
+                            <span className="text-[9px] uppercase tracking-wider font-extrabold text-primary max-w-[120px] truncate block">
+                              {activeDonutCounts.title}
+                            </span>
+                            <span className="text-xs font-extrabold text-indigo-500 dark:text-indigo-400 mt-1">
+                              T: {activeDonutCounts.tCount} ({activeDonutCounts.tPct.toFixed(0)}%)
+                            </span>
+                            <span className="text-xs font-extrabold text-emerald-500 dark:text-emerald-400">
+                              S: {activeDonutCounts.sCount} ({activeDonutCounts.sPct.toFixed(0)}%)
+                            </span>
+                            <span className="text-[9px] font-bold text-gray-550 dark:text-gray-400 mt-0.5">
+                              Nodes: {activeDonutCounts.total}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-[9px] uppercase tracking-wider font-extrabold text-gray-400 dark:text-gray-500">
+                              System Ratios
+                            </span>
+                            <span className="text-xl font-extrabold text-gray-950 dark:text-white leading-tight">
+                              {activeDonutCounts.total} Nodes
+                            </span>
+                            <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 mt-1">
+                              T: {activeDonutCounts.tCount} | S: {activeDonutCounts.sCount}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Color-coded interactive legend list with dual tracking progress bars */}
+                    <div className="flex-1 w-full max-h-64 overflow-y-auto pr-2 space-y-2.5 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-slate-700">
+                      {/* Global indicator badges */}
+                      <div className="flex justify-between items-center bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-outline-variant/15 dark:border-slate-800 text-[10px] font-extrabold mb-1">
+                        <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-bold">
+                          <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                          <span>Teachers (T)</span>
                         </div>
-                        <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2 relative overflow-hidden">
-                          <div
-                            className="bg-primary h-full rounded-full transition-all duration-500"
-                            style={{ width: `${percentage}%` }}
-                          ></div>
+                        <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          <span>Students (S)</span>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+
+                      {specialtyShareData.map((item, index) => {
+                        const isHovered = hoveredSpecialtyIndex === index;
+                        const total = item.totalCount;
+                        const tPct = total > 0 ? (item.teacherCount / total) * 100 : 0;
+                        const sPct = total > 0 ? (item.studentCount / total) * 100 : 0;
+
+                        return (
+                          <div
+                            key={item.subject}
+                            onMouseEnter={() => setHoveredSpecialtyIndex(index)}
+                            onMouseLeave={() => setHoveredSpecialtyIndex(null)}
+                            className={`space-y-1.5 p-2 rounded-xl transition-all duration-200 cursor-pointer ${
+                              isHovered
+                                ? 'bg-gray-50 dark:bg-slate-700/60 translate-x-1'
+                                : 'hover:bg-gray-50/50 dark:hover:bg-slate-700/30'
+                            }`}
+                            style={{
+                              opacity: hoveredSpecialtyIndex !== null && !isHovered ? 0.5 : 1
+                            }}
+                          >
+                            <div className="flex justify-between items-center text-xs font-bold">
+                              <span className="text-gray-800 dark:text-gray-200 font-extrabold">{item.subject}</span>
+                              <span className="text-gray-500 dark:text-gray-405 font-mono text-[10px] font-bold">
+                                T: {item.teacherCount} ({tPct.toFixed(0)}%) | S: {item.studentCount} ({sPct.toFixed(0)}%)
+                              </span>
+                            </div>
+
+                            {/* Stacked Proportional Track Line */}
+                            <div className="w-full bg-gray-100 dark:bg-slate-750 rounded-full h-2 relative flex overflow-hidden">
+                              {total > 0 ? (
+                                <>
+                                  <div
+                                    className="bg-indigo-500 dark:bg-indigo-400 h-full transition-all duration-300"
+                                    style={{ width: `${tPct}%` }}
+                                  />
+                                  <div
+                                    className="bg-emerald-500 dark:bg-emerald-400 h-full transition-all duration-300"
+                                    style={{ width: `${sPct}%` }}
+                                  />
+                                </>
+                              ) : (
+                                <div className="bg-gray-200 dark:bg-slate-800 w-full h-full" />
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Logs */}
@@ -1475,7 +2028,10 @@ export default function AdminDashboard() {
                 Active Students Directory
               </h2>
               <button
-                onClick={() => setIsAddStudentOpen(true)}
+                onClick={() => {
+                  generateStudentTempCredentials();
+                  setIsAddStudentOpen(true);
+                }}
                 className="px-4 py-2 bg-primary text-on-secondary rounded-xl text-xs font-bold flex items-center gap-2 shadow hover:opacity-90 transition-all active:scale-95"
               >
                 <span className="material-symbols-outlined text-[18px]">person_add</span>
@@ -1759,6 +2315,69 @@ export default function AdminDashboard() {
                       </div>
                     </div>
 
+                    {/* Credential Generation Panel */}
+                    <div className="p-4 bg-gray-50 dark:bg-slate-805/60 rounded-2xl border border-gray-250/20 dark:border-slate-700 space-y-3">
+                      <h3 className="text-xs font-extrabold text-gray-750 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[16px] text-primary">key</span>
+                        Generated Temp Credentials
+                      </h3>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[10px] font-bold text-gray-500 block mb-0.5">Student ID / User ID</label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              readOnly
+                              className="w-full px-3 py-2 bg-white dark:bg-slate-850 border border-gray-350 dark:border-slate-650 rounded-lg text-xs font-mono font-bold text-gray-800 dark:text-gray-200 outline-none"
+                              value={studentGeneratedId}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(studentGeneratedId);
+                                toast.success("Student ID copied!");
+                              }}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary flex items-center"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="text-[10px] font-bold text-gray-500 block mb-0.5">Temporary Password</label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              readOnly
+                              className="w-full px-3 py-2 bg-white dark:bg-slate-850 border border-gray-350 dark:border-slate-650 rounded-lg text-xs font-mono font-bold text-gray-800 dark:text-gray-200 outline-none"
+                              value={studentGeneratedPassword}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(studentGeneratedPassword);
+                                toast.success("Password copied!");
+                              }}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary flex items-center"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <button
+                        type="button"
+                        onClick={generateStudentTempCredentials}
+                        className="text-[11px] text-primary dark:text-primary-fixed-dim hover:underline font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer p-0"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">refresh</span>
+                        Regenerate Credentials
+                      </button>
+                    </div>
+
                     <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30 dark:border-slate-800">
                       <button
                         type="button"
@@ -1905,97 +2524,150 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm">
                 <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-1">Total Inflow (Student Fees)</span>
-                <span className="text-2xl font-extrabold text-green-600 dark:text-green-400">+${stats.inflowTotal}</span>
+                <span className="text-2xl font-extrabold text-green-600 dark:text-green-400">+${filteredInflowTotal}</span>
               </div>
               <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm">
                 <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-1">Total Outflow (Tutor Payouts)</span>
-                <span className="text-2xl font-extrabold text-red-600 dark:text-red-400">-${stats.outflowTotal}</span>
+                <span className="text-2xl font-extrabold text-red-600 dark:text-red-400">-${filteredOutflowTotal}</span>
               </div>
               <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl p-6 shadow-sm">
                 <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-1">Net Earnings Margin</span>
-                <span className="text-2xl font-extrabold text-primary dark:text-primary-fixed-dim">${stats.netProfit}</span>
+                <span className={`text-2xl font-extrabold ${
+                  filteredNetProfit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {filteredNetProfit >= 0 ? '+' : '-'}${Math.abs(filteredNetProfit)}
+                </span>
               </div>
             </div>
 
             {/* Financial ledger actions header */}
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
-                Unified Financial Ledger
-              </h2>
-              <button
-                onClick={() => setIsAddTxOpen(true)}
-                className="px-4 py-2 bg-primary text-on-secondary rounded-xl text-xs font-bold flex items-center gap-2 shadow hover:opacity-90 transition-all active:scale-95"
-              >
-                <span className="material-symbols-outlined text-[18px]">receipt_long</span>
-                Record Transaction
-              </button>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="space-y-1">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
+                  Unified Financial Ledger
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Track student inflows, tutor disbursements, and net cash margins.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                {/* Timeline Filters */}
+                <div className="inline-flex rounded-xl p-1 bg-gray-100 dark:bg-slate-800/80 border border-outline-variant/20 dark:border-slate-700">
+                  {[
+                    { id: 'all', label: 'All Time' },
+                    { id: 'daily', label: 'Daily' },
+                    { id: 'weekly', label: 'Weekly' },
+                    { id: 'monthly', label: 'Monthly' }
+                  ].map((filter) => (
+                    <button
+                      key={filter.id}
+                      onClick={() => setTimeFilter(filter.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        timeFilter === filter.id
+                          ? 'bg-white dark:bg-slate-700 text-primary dark:text-white shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                    >
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setIsAddTxOpen(true)}
+                  className="px-4 py-2 bg-primary text-on-secondary rounded-xl text-xs font-bold flex items-center gap-2 shadow hover:opacity-90 transition-all active:scale-95"
+                >
+                  <span className="material-symbols-outlined text-[18px]">receipt_long</span>
+                  Record Transaction
+                </button>
+              </div>
             </div>
 
-            {/* Ledger Table */}
-            <div className="bg-white dark:bg-slate-800 border border-outline-variant/30 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400 font-extrabold border-b border-outline-variant/30 dark:border-slate-700">
-                      <th className="px-6 py-4">Transaction ID</th>
-                      <th className="px-6 py-4">Posting Date</th>
-                      <th className="px-6 py-4">Description</th>
-                      <th className="px-6 py-4">Type</th>
-                      <th className="px-6 py-4">Cash Flow</th>
-                      <th className="px-6 py-4">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
-                    {ledger.length > 0 ? (
-                      ledger.map(tx => (
-                        <tr key={tx.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
-                          <td className="px-6 py-4 font-mono font-bold text-gray-700 dark:text-gray-300">
-                            {tx.id}
-                          </td>
-                          <td className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">
-                            {tx.date}
-                          </td>
-                          <td className="px-6 py-4 font-semibold text-gray-950 dark:text-white">
-                            {tx.description}
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-block px-2 py-0.5 rounded font-extrabold uppercase text-[9px] ${
-                              tx.type === 'inflow'
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                            }`}>
-                              {tx.type === 'inflow' ? 'Student Fees' : 'Tutor Payout'}
-                            </span>
-                          </td>
-                          <td className={`px-6 py-4 font-extrabold text-sm ${
-                            tx.type === 'inflow' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+            {/* Ledger Table scroll container wrapper */}
+            <div className="max-h-[400px] overflow-y-auto relative border border-outline-variant/30 dark:border-slate-700 rounded-3xl shadow-sm bg-white dark:bg-slate-800">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="sticky top-0 bg-gray-50 dark:bg-slate-700 text-gray-500 dark:text-gray-400 font-extrabold border-b border-outline-variant/30 dark:border-slate-700 z-10">
+                    <th className="px-6 py-4">Transaction ID</th>
+                    <th className="px-6 py-4">Posting Date</th>
+                    <th className="px-6 py-4">Description</th>
+                    <th className="px-6 py-4">Type</th>
+                    <th className="px-6 py-4">Cash Flow</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 text-center">Receipt</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
+                  {filteredLedger.length > 0 ? (
+                    filteredLedger.map(tx => (
+                      <tr key={tx.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="px-6 py-4 font-mono font-bold text-gray-700 dark:text-gray-300">
+                          {tx.id}
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">
+                          {tx.date}
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-gray-950 dark:text-white">
+                          {tx.description}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-block px-2 py-0.5 rounded font-extrabold uppercase text-[9px] ${
+                            tx.type === 'inflow'
+                              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                           }`}>
-                            {tx.type === 'inflow' ? '+' : '-'}${tx.amount}
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-block px-2 py-0.5 rounded font-extrabold text-[9px] ${
-                              tx.status === 'Completed'
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                : tx.status === 'Pending'
-                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                            }`}>
-                              {tx.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="6" className="text-center py-12 text-gray-500 font-semibold">
-                          No transaction records listed.
+                            {tx.type === 'inflow' ? 'Student Fees' : 'Tutor Payout'}
+                          </span>
+                        </td>
+                        <td className={`px-6 py-4 font-extrabold text-sm ${
+                          tx.type === 'inflow' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                        }`}>
+                          {tx.type === 'inflow' ? '+' : '-'}${tx.amount}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-block px-2 py-0.5 rounded font-extrabold text-[9px] ${
+                            tx.status === 'Completed'
+                              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : tx.status === 'Pending'
+                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                              : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                          }`}>
+                            {tx.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => downloadMockReceipt(tx)}
+                            title="Download PDF Receipt"
+                            className="p-1.5 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary-fixed-dim hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-all active:scale-95 inline-flex items-center"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">download</span>
+                          </button>
                         </td>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="7" className="text-center py-12 text-gray-500 font-semibold">
+                        No transaction records listed for the selected timeline.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+                <tfoot className="sticky bottom-0 bg-slate-900 dark:bg-slate-950 text-white font-bold z-10 border-t border-slate-800">
+                  <tr>
+                    <td colSpan="4" className="px-6 py-4 text-left font-bold text-xs uppercase tracking-wider text-slate-300">
+                      Net Cash Flow (Completed Transactions)
+                    </td>
+                    <td colSpan="3" className={`px-6 py-4 text-left font-extrabold text-sm ${
+                      filteredNetProfit >= 0 ? 'text-green-400' : 'text-red-400'
+                    }`}>
+                      {filteredNetProfit >= 0 ? '+' : '-'}${Math.abs(filteredNetProfit).toFixed(2)}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
 
             {/* Record Transaction Modal */}
@@ -2027,16 +2699,79 @@ export default function AdminDashboard() {
                         <option value="outflow">Tutor Payout (Outflow -)</option>
                       </select>
                     </div>
-                    <div>
+                    <div className="relative">
                       <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Transaction Description</label>
-                      <input
-                        type="text"
-                        required
-                        className="w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-sm text-gray-900 dark:text-white"
-                        placeholder="e.g. Student Registration: John Doe"
-                        value={txDesc}
-                        onChange={(e) => setTxDesc(e.target.value)}
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          required
+                          className="w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-sm text-gray-900 dark:text-white pr-10"
+                          placeholder={txType === 'inflow' ? "Search student CRM records..." : "Search tutor CRM records..."}
+                          value={txDesc}
+                          onChange={(e) => {
+                            setTxDesc(e.target.value);
+                            setIsComboOpen(true);
+                          }}
+                          onFocus={() => setIsComboOpen(true)}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setIsComboOpen(!isComboOpen)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-white flex items-center justify-center"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">
+                            {isComboOpen ? 'arrow_drop_up' : 'arrow_drop_down'}
+                          </span>
+                        </button>
+                      </div>
+
+                      {/* Combobox Dropdown */}
+                      {isComboOpen && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-10"
+                            onClick={() => setIsComboOpen(false)}
+                          />
+                          <div className="absolute left-0 right-0 mt-1 max-h-[200px] overflow-y-auto bg-white dark:bg-slate-800 border border-outline-variant dark:border-slate-700 rounded-xl shadow-lg z-20 divide-y divide-gray-100 dark:divide-slate-700/50">
+                            {filteredComboSuggestions.length > 0 ? (
+                              filteredComboSuggestions.map((item, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => {
+                                    setTxDesc(item.value);
+                                    // Try to auto-populate amount based on chosen CRM entity
+                                    if (txType === 'inflow') {
+                                      const studentBooking = bookings.find(b => b.studentName === item.title);
+                                      if (studentBooking) {
+                                        setTxAmount(studentBooking.price.toString());
+                                      } else {
+                                        setTxAmount('85');
+                                      }
+                                    } else {
+                                      const tutorObj = tutors.find(t => t.name === item.title);
+                                      if (tutorObj) {
+                                        setTxAmount((tutorObj.price || 85).toString());
+                                      } else {
+                                        setTxAmount('150');
+                                      }
+                                    }
+                                    setIsComboOpen(false);
+                                  }}
+                                  className="w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-slate-700/60 transition-colors flex flex-col gap-0.5"
+                                >
+                                  <span className="text-xs font-bold text-gray-900 dark:text-white">{item.title}</span>
+                                  <span className="text-[10px] text-gray-500 dark:text-gray-400">{item.subtitle}</span>
+                                </button>
+                              ))
+                            ) : (
+                              <div className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 text-center font-medium">
+                                No matching CRM records found. Type manually.
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>

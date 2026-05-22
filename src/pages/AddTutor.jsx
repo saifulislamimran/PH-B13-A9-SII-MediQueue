@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useDocumentTitle from '../hooks/useDocumentTitle';
@@ -47,12 +47,14 @@ export default function AddTutor() {
 
   // Generate on load
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     generateTempCredentials();
   }, []);
 
   // Pre-fill with current user's profile if they are a student applying to become tutor
   useEffect(() => {
     if (user && user.role !== 'admin' && user.role !== 'tutor') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFullName(user.displayName || '');
       setEmail(user.email || '');
     }

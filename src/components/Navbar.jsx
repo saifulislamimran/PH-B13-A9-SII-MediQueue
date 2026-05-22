@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
-  const { user, logoutUser, updateUserProfile } = useAuth();
+  const { user, logoutUser } = useAuth();
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
